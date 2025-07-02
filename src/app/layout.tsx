@@ -1,14 +1,12 @@
 import type {Metadata} from "next";
 
-import {Roboto, Inter} from "next/font/google";
+import {Roboto} from "next/font/google";
 
 import "./globals.css";
 
 import Aside from "./components/Aside";
-
-export const roboto = Roboto({subsets: ["latin"], weight: "100"});
-
-export const inter = Inter({subsets: ["latin"], weight: "400"});
+const roboto = Roboto({subsets: ["latin"], weight: "100"});
+// const inter = Inter({subsets: ["latin"], weight: "400"});
 
 export const metadata: Metadata = {
   title: "Burgerli - sistema de gestionamiento",
@@ -18,7 +16,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="es">
-      <body className={`${inter.className} h-full bg-white antialiased`}>
+      <body className={`${roboto.className} h-full bg-white font-bold antialiased`}>
         <Aside />
         {children}
       </body>

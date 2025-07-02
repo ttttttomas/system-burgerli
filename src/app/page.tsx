@@ -4,7 +4,7 @@ import PopupOrders from "./components/PopupOrders";
 
 export default async function HomePage() {
   return (
-    <main className="ml-80 h-full text-black">
+    <main className="ml-80 h-full font-bold text-black">
       <PopupOrders />
       <h2 className="pt-5 text-2xl font-bold">Pedidos en preparación</h2>
       {/* LISTA DE PEDIDOS EN PREPARACION*/}

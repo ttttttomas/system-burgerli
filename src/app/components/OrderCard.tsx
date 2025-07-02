@@ -1,10 +1,13 @@
 "use client";
 
 import {useState} from "react";
+import {Inter} from "next/font/google";
 
 import {Order} from "../../types";
 
 import Cruz from "./Cruz";
+
+const inter = Inter({subsets: ["latin"], weight: "400"});
 
 const orders = [
   {
@@ -73,7 +76,9 @@ export default function OrderCard() {
   };
 
   return (
-    <section className="container flex max-w-80 flex-col rounded-xl bg-[#FCEDCC] shadow-lg shadow-black/50">
+    <section
+      className={`${inter.className} container flex max-w-80 flex-col rounded-xl bg-[#FCEDCC] shadow-lg shadow-black/50`}
+    >
       <div className="flex flex-col items-center rounded-t-xl bg-[#FD4E4E] px-5 py-1">
         <div className="flex w-full items-center justify-between">
           <small className="font-semibold">#123456</small>
