@@ -125,7 +125,7 @@ export default function OrderCard() {
         </button>
       </div>
       {selectedOrder && (
-        <aside className="absolute top-0 right-0 z-40 flex h-full flex-col gap-5 bg-[#FCEDCC] shadow-xl shadow-black/40 transition-all duration-300">
+        <aside className="fixed top-0 right-0 z-40 flex h-full flex-col gap-5 bg-[#FCEDCC] shadow-xl shadow-black/40 transition-all duration-300">
           <div className="flex items-center justify-between bg-[#EEAA4B] px-5 py-3">
             <p className="text-md bg-[#EEAA4B] text-center font-bold text-black">En preparación</p>
             <div className="cursor-pointer" onClick={handleClick}>

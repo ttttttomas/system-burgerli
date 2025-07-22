@@ -5,7 +5,10 @@ import {Roboto} from "next/font/google";
 import "./globals.css";
 
 import Aside from "./components/Aside";
-const roboto = Roboto({subsets: ["latin"], weight: "100"});
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
 // const inter = Inter({subsets: ["latin"], weight: "400"});
 
 export const metadata: Metadata = {

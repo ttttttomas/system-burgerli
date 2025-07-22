@@ -69,7 +69,7 @@ export default function LoginPage() {
               </div>
 
               <button
-                className="w-full rounded-md bg-[#EEAA4B] py-2 font-semibold text-black hover:bg-[#e39632]"
+                className="w-full cursor-pointer rounded-md bg-[#EEAA4B] py-2 font-semibold text-black hover:bg-[#e39632]"
                 type="submit"
               >
                 Ingresar

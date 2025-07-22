@@ -16,13 +16,13 @@ export default function PopupOrders() {
     <section>
       {/*  Blur overlay */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/60" /> // sin blur
+        <div className="fixed inset-0 bg-black/70" /> // sin blur
       )}
       <div
         className={
           isOpen
-            ? "absolute top-5 right-94 z-40 flex cursor-pointer items-center transition-all duration-300"
-            : "absolute top-5 right-5 z-40 flex cursor-pointer items-center transition-all duration-300"
+            ? "fixed top-5 right-94 z-40 flex cursor-pointer items-center transition-all duration-300"
+            : "fixed top-5 right-5 z-40 flex cursor-pointer items-center transition-all duration-300"
         }
         onClick={handleClick}
       >
@@ -34,7 +34,7 @@ export default function PopupOrders() {
 
       {isOpen ? (
         <aside
-          className={`absolute top-0 right-0 z-40 flex ${isOpen ? "opacity-100" : "opacity-0"} h-full flex-col gap-5 bg-[#FCEDCC] shadow-xl shadow-black/40 transition-all duration-300`}
+          className={`fixed top-0 right-0 z-40 flex ${isOpen ? "opacity-100" : "opacity-0"} h-full flex-col gap-5 bg-[#FCEDCC] shadow-xl shadow-black/40 transition-all duration-300`}
         >
           <div className="flex items-center justify-between bg-[#EEAA4B] px-5 py-3">
             <NewOrderIcon />
