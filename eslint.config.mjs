@@ -20,6 +20,8 @@ export default [
   // General configuration
   {
     rules: {
+      extends: ["next/core-web-vitals"],
+
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "padding-line-between-statements": [
@@ -28,7 +30,7 @@ export default [
         {blankLine: "always", prev: ["const", "let", "var"], next: "*"},
         {blankLine: "any", prev: ["const", "let", "var"], next: ["const", "let", "var"]},
       ],
-      "no-console": "warn",
+      "no-console": "off",
     },
   },
   // React configuration
