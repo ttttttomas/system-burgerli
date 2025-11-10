@@ -2,18 +2,41 @@
 import {useState} from "react";
 import {Eye, EyeOff} from "lucide-react";
 import {useRouter} from "next/navigation";
+import {toast} from "sonner";
+
+import {useSession} from "../context/SessionContext";
 
 export default function LoginPage() {
+  const {loginUser} = useSession();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [user, setUser] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [loading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log({user, password});
-    router.push("/");
+    try {
+      toast.success("Sesión iniciada correctamente");
+      await loginUser(user, password);
+      router.push("/");
+      router.refresh();
+    } catch (error: any) {
+      setError("Error al iniciar sesión");
+    }
   };
+
+  if (loading) {
+    return (
+      <main className="flex min-h-screen w-full items-center justify-center bg-[#fdecc9]">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-[#b36912]" />
+          <p className="mt-4 text-[#4b2f1e]">Verificando sesión...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex h-screen max-h-screen flex-col items-center justify-start gap-52">
@@ -67,7 +90,7 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-
+              {error && <p className="text-sm text-red-500">{error}</p>}
               <button
                 className="w-full cursor-pointer rounded-md bg-[#EEAA4B] py-2 font-semibold text-black hover:bg-[#e39632]"
                 type="submit"

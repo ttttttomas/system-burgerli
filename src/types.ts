@@ -1,17 +1,25 @@
-export type Order = {
-  id: string;
-  combo?: string;
-  user_client: string;
+export type Orders = {
+  id_order?: string;
+  // created_at: string; // VIENEN CREADOS DESDE LA BASE DE DATOS
   payment_method: string;
   delivery_mode: string;
   price: number;
   status: string;
-  coupon?: string;
-  order_notes?: string;
+  order_notes?: string | null;
   local: string;
-  burgers: string;
-  fries: string;
-  drinks: string;
-  sin: string;
-  extras: string;
+  name: string;
+  phone: number;
+  email: string;
+  address: string | null;
+  coupon?: string | null;
+  fries?: string | null;
+  drinks?: string | null;
+  products: string[];
+};
+
+export type SessionUser = {
+  id: string;
+  username: string;
+  local: string;
+  rol: string;
 };

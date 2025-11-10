@@ -1,8 +1,96 @@
-import PopupOrders from "../components/PopupOrders";
+"use client";
+import {ArrowUpDown} from "lucide-react";
+
+import {useSession} from "../context/SessionContext";
 import Lupa from "../components/Lupa";
 
 export default function OrderPages() {
+  const {session} = useSession();
   const mockData = [
+    {
+      id: "#123456",
+      cliente: "Mariano Fernandez",
+      fecha: "08/09/25",
+      metodo: "Tarjeta",
+      estado: "Entregado",
+    },
+    {
+      id: "#123456",
+      cliente: "Martina Perez",
+      fecha: "08/09/25",
+      metodo: "Efectivo",
+      estado: "En preparación",
+    },
+    {
+      id: "#123456",
+      cliente: "Lucía Hernandez",
+      fecha: "08/09/25",
+      metodo: "Tarjeta",
+      estado: "En camino",
+    },
+    {
+      id: "#123456",
+      cliente: "Mariano Fernandez",
+      fecha: "08/09/25",
+      metodo: "Tarjeta",
+      estado: "Entregado",
+    },
+    {
+      id: "#123456",
+      cliente: "Martina Perez",
+      fecha: "08/09/25",
+      metodo: "Efectivo",
+      estado: "En preparación",
+    },
+    {
+      id: "#123456",
+      cliente: "Lucía Hernandez",
+      fecha: "08/09/25",
+      metodo: "Tarjeta",
+      estado: "En camino",
+    },
+    {
+      id: "#123456",
+      cliente: "Mariano Fernandez",
+      fecha: "08/09/25",
+      metodo: "Tarjeta",
+      estado: "Entregado",
+    },
+    {
+      id: "#123456",
+      cliente: "Martina Perez",
+      fecha: "08/09/25",
+      metodo: "Efectivo",
+      estado: "En preparación",
+    },
+    {
+      id: "#123456",
+      cliente: "Lucía Hernandez",
+      fecha: "08/09/25",
+      metodo: "Tarjeta",
+      estado: "En camino",
+    },
+    {
+      id: "#123456",
+      cliente: "Mariano Fernandez",
+      fecha: "08/09/25",
+      metodo: "Tarjeta",
+      estado: "Entregado",
+    },
+    {
+      id: "#123456",
+      cliente: "Martina Perez",
+      fecha: "08/09/25",
+      metodo: "Efectivo",
+      estado: "En preparación",
+    },
+    {
+      id: "#123456",
+      cliente: "Lucía Hernandez",
+      fecha: "08/09/25",
+      metodo: "Tarjeta",
+      estado: "En camino",
+    },
     {
       id: "#123456",
       cliente: "Mariano Fernandez",
@@ -29,8 +117,7 @@ export default function OrderPages() {
 
   return (
     <main className="mr-8 ml-80 flex flex-col justify-start gap-5 text-black">
-      <PopupOrders />
-      <h1 className="pt-5 text-2xl font-bold">Historial de pedidos - Lanús</h1>
+      <h1 className="pt-5 text-2xl font-bold">Historial de pedidos - {session?.local}</h1>
       <section className="flex items-center justify-start gap-20">
         <div className="flex w-max items-center gap-2 rounded-xl bg-[#EEAA4B] p-2">
           <Lupa />
@@ -54,7 +141,7 @@ export default function OrderPages() {
                   <th key={i} className="px-4 py-2 text-left font-medium whitespace-nowrap">
                     <div className="flex items-center gap-1">
                       <span>{header}</span>
-                      {/* {i < 5 && <ArrowUpDown className="w-4 h-4" />} */}
+                      {i < 5 && <ArrowUpDown className="h-4 w-4" />}
                     </div>
                   </th>
                 ),

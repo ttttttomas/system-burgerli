@@ -6,11 +6,22 @@ import NewOrderCard from "./NewOrderCard";
 import NewOrderIcon from "./NewOrderIcon";
 import Cruz from "./Cruz";
 
-export default function PopupOrders() {
+import {Orders} from "@/types";
+
+interface PopupOrdersProps {
+  orders: Orders[];
+  onMoveToPreparation: (orderId: string) => void;
+}
+
+export default function PopupOrders({orders, onMoveToPreparation}: PopupOrdersProps) {
   const [isOpen, setIsOpen] = useState(false);
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
+
+  const orderCount = orders.length;
+
+  const count = orderCount > 9 ? "+9" : orderCount;
 
   return (
     <section>
@@ -26,7 +37,9 @@ export default function PopupOrders() {
         }
         onClick={handleClick}
       >
-        <p className="z-40 -mx-4 rounded-full bg-[#4BBC34] p-1 text-2xl font-bold text-black">+9</p>
+        <p className="z-40 -mx-4 rounded-full bg-[#4BBC34] p-1 text-2xl font-bold text-black">
+          {count}
+        </p>
         <div className="rounded-full bg-[#4BBC34] p-2 shadow-xl shadow-black/40">
           <PopupIcon />
         </div>
@@ -45,12 +58,20 @@ export default function PopupOrders() {
               <Cruz />
             </div>
           </div>
-          <section className="flex flex-col gap-5 px-5 py-3">
-            <NewOrderCard />
-            <NewOrderCard />
-            <NewOrderCard />
-            <NewOrderCard />
-            <NewOrderCard />
+          <section className="flex flex-col gap-5 overflow-y-auto px-5 py-3">
+            {orders.length > 0 ? (
+              orders.map((order, index) => (
+                <NewOrderCard
+                  key={order.id_order || index}
+                  order={order}
+                  orderNumber={`${index + 1}`}
+                  timeAgo="Hace un momento"
+                  onMoveToPreparation={onMoveToPreparation}
+                />
+              ))
+            ) : (
+              <p className="text-center text-gray-600">No hay pedidos nuevos</p>
+            )}
           </section>
         </aside>
       ) : (

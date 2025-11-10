@@ -1,31 +1,48 @@
-import OrderCard from "./components/OrderCard";
-import OrderReadyCard from "./components/OrderReadyCard";
-import PopupOrders from "./components/PopupOrders";
+"use client";
+import {useRouter} from "next/navigation";
+import {useEffect} from "react";
 
-export default async function HomePage() {
-  return (
-    <main className="ml-80 h-full font-bold text-black">
-      <PopupOrders />
-      <h2 className="pt-5 text-2xl font-bold">Pedidos en preparación</h2>
-      {/* LISTA DE PEDIDOS EN PREPARACION*/}
-      <section className="my-10 flex flex-wrap items-center justify-center gap-14">
-        <OrderCard />
-        <OrderCard />
-        <OrderCard />
-        <OrderCard />
-        <OrderCard />
-        <OrderCard />
-        <OrderCard />
-        <OrderCard />
-      </section>
-      <h2 className="text-2xl font-bold">Pedidos listos para retirar</h2>
-      {/* LISTA DE PEDIDOS PARA RETIRAR */}
-      <section className="my-10 flex items-center gap-10">
-        <OrderReadyCard />
-        <OrderReadyCard />
-        <OrderReadyCard />
-        <OrderReadyCard />
-      </section>
-    </main>
-  );
+import {useSession} from "./context/SessionContext";
+
+export default function HomePage() {
+  const {session, loading} = useSession();
+  const router = useRouter();
+
+  console.log(session);
+
+  useEffect(() => {
+    // Esperar a que termine de cargar antes de hacer cualquier redirección
+    if (loading) {
+      return;
+    }
+
+    if (!session) {
+      console.log("No hay sesión");
+      router.push("/login");
+
+      return;
+    }
+
+    if (session.rol === "admin") {
+      console.log("Es un admin");
+      router.push("/admin");
+    } else if (session.rol === "employed") {
+      console.log("Es un empleado");
+      router.push("/pedidos");
+    }
+  }, [session, loading, router]);
+
+  // Mostrar un indicador de carga mientras se verifica la sesión
+  if (loading) {
+    return (
+      <main className="flex min-h-screen w-full items-center justify-center bg-[#fdecc9]">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-[#b36912]" />
+          <p className="mt-4 text-[#4b2f1e]">Verificando sesión...</p>
+        </div>
+      </main>
+    );
+  }
+
+  return null;
 }
