@@ -20,6 +20,8 @@ export default [
   // General configuration
   {
     rules: {
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "off",
       "padding-line-between-statements": [
         "warn",
         {blankLine: "always", prev: "*", next: ["return", "export"]},
