@@ -1,11 +1,12 @@
 "use client";
-import {useState} from "react";
+import { useState } from "react";
 
 import Moto from "./Moto";
 import Ubicacion from "./Ubicacion";
 import Tarjeta from "./Tarjeta";
 
-import {Orders} from "@/types";
+import { Orders } from "@/types";
+import { parseLineItems } from "@/lib/ProductsToJson";
 
 interface NewOrderCardProps {
   order: Orders;
@@ -25,6 +26,8 @@ export default function NewOrderCard({
 
   const openModal = (order: Orders) => {
     setSelectedOrder(order);
+    console.log(order);
+    
   };
 
   const closeModal = () => {
@@ -37,6 +40,11 @@ export default function NewOrderCard({
       closeModal();
     }
   };
+ 
+
+  const obj = parseLineItems(order.products);
+
+
 
   return (
     <>
@@ -58,7 +66,10 @@ export default function NewOrderCard({
       {selectedOrder && (
         <>
           {/* Overlay oscuro */}
-          <div className="fixed inset-0 z-50 cursor-pointer bg-black/70" onClick={closeModal} />
+          <div
+            className="fixed inset-0 z-50 cursor-pointer bg-black/70"
+            onClick={closeModal}
+          />
 
           {/* Modal centrado con dos columnas */}
           <div className="fixed top-1/2 left-1/2 z-50 grid max-h-[95vh] w-[80%] max-w-5xl -translate-x-1/2 -translate-y-1/2 transform grid-cols-2 overflow-hidden rounded-xl shadow-2xl">
@@ -126,7 +137,9 @@ export default function NewOrderCard({
               {selectedOrder.order_notes && (
                 <div className="flex flex-col gap-2">
                   <h3 className="text-xl font-bold">Nota del cliente</h3>
-                  <p className="text-sm font-normal">{selectedOrder.order_notes}</p>
+                  <p className="text-sm font-normal">
+                    {selectedOrder.order_notes}
+                  </p>
                 </div>
               )}
 
@@ -150,26 +163,29 @@ export default function NewOrderCard({
               {/* Lista de productos con scroll */}
               <div className="flex-1 overflow-y-auto p-8">
                 <div className="flex flex-col gap-4">
-                  {selectedOrder.products && selectedOrder.products.length > 0 ? (
-                    selectedOrder.products.map((product, index) => (
+                  {selectedOrder.products &&
+                  selectedOrder.products.length > 0 ? (
+                    obj.map((product, index) => (
                       <div
                         key={index}
                         className="flex flex-col gap-2 border-b border-gray-300 pb-4"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex gap-3">
-                            <span className="font-bold">1x</span>
+                            <span className="font-bold">{product.quantity}x</span>
                             <div className="flex flex-col gap-1">
-                              <p className="font-bold">{product}</p>
+                              <p className="font-bold">{product.name}</p>
                               {/* Aquí puedes agregar extras, sin, papas si vienen en el producto */}
                             </div>
                           </div>
-                          <span className="font-bold">$0</span>
+                          <span className="font-bold">${product.price.toLocaleString()}</span>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-600">No hay productos en este pedido</p>
+                    <p className="text-gray-600">
+                      No hay productos en este pedido
+                    </p>
                   )}
                 </div>
               </div>

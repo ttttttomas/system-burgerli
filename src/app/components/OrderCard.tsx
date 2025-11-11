@@ -2,7 +2,7 @@
 
 import {useEffect, useRef, useState} from "react";
 import {Inter} from "next/font/google";
-
+import { parseLineItems } from "@/lib/ProductsToJson";
 import Cruz from "./Cruz";
 
 import {Orders} from "@/types";
@@ -78,7 +78,7 @@ export default function OrderCard({order, onMoveToReady}: OrderCardProps) {
     }
   };
 
-  const productCount = order.products?.length || 0;
+  const obj = parseLineItems(order.products)
 
   return (
     <section className={`${inter.className} relative`}>
@@ -87,11 +87,11 @@ export default function OrderCard({order, onMoveToReady}: OrderCardProps) {
         ref={gridRef}
         className={selectedOrder ? "pointer-events-none opacity-95 select-none" : ""}
       >
-        <div className="container flex max-w-80 flex-col rounded-xl bg-[#FCEDCC] shadow-lg shadow-black/50">
+        <div className="container flex w-80 flex-col rounded-xl bg-[#FCEDCC] shadow-lg shadow-black/50">
           <div className="flex flex-col items-center rounded-t-xl bg-[#FD4E4E] px-5 py-1">
             <div className="flex w-full items-center justify-between">
-              <small className="font-semibold">#{order.id_order?.slice(0, 7)}</small>
-              <small className="font-semibold">Hace 30 minutos</small>
+              <small className="font-semibold">#{order.id_order?.slice(0, 5)}</small>
+              <small className="font-semibold">{new Date().toLocaleTimeString()}</small>
             </div>
             <b className="block">{order.name}</b>
           </div>
@@ -99,11 +99,11 @@ export default function OrderCard({order, onMoveToReady}: OrderCardProps) {
           <div className="flex flex-col items-start">
             {/* Productos */}
             {order.products && order.products.length > 0 ? (
-              order.products.map((product, index) => (
+              obj.map((product, index) => (
                 <div key={index} className="flex gap-3 p-5">
-                  <p className="mt-3 text-xl font-bold">1x</p>
+                  <p className="mt-3 text-xl font-bold">{product.quantity}x</p>
                   <ul className="flex flex-col gap-1">
-                    <li className="font-bold">{product}</li>
+                    <li className="font-bold">{product.name}</li>
                   </ul>
                 </div>
               ))
@@ -177,13 +177,13 @@ export default function OrderCard({order, onMoveToReady}: OrderCardProps) {
               <h3 className="text-center font-bold underline">Pedido</h3>
               <ul className="flex flex-col gap-1">
                 {selectedOrder.products && selectedOrder.products.length > 0 ? (
-                  selectedOrder.products.map((product, index) => (
+                  obj.map((product, index) => (
                     <li key={index} className="flex gap-5">
-                      <b>1x</b>
+                      <b>{product.quantity}x</b>
                       <ul>
-                        <li className="font-bold">{product}</li>
+                        <li className="font-bold">{product.name}</li>
                       </ul>
-                      <small>$0</small>
+                      <small>${product.price.toLocaleString()}</small>
                     </li>
                   ))
                 ) : (

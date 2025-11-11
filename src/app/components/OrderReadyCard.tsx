@@ -4,6 +4,7 @@ import {useState} from "react";
 import Cruz from "./Cruz";
 
 import {Orders} from "@/types";
+import { parseLineItems } from "@/lib/ProductsToJson";
 
 interface OrderReadyCardProps {
   order: Orders;
@@ -29,6 +30,8 @@ export default function OrderReadyCard({order, onMarkAsDelivered}: OrderReadyCar
   };
 
   const productCount = order.products?.length || 0;
+
+  const obj = parseLineItems(order.products);
 
   return (
     <>
@@ -91,13 +94,13 @@ export default function OrderReadyCard({order, onMarkAsDelivered}: OrderReadyCar
             <h3 className="text-center font-bold underline">Pedido</h3>
             <ul className="flex flex-col gap-1">
               {selectedOrder.products && selectedOrder.products.length > 0 ? (
-                selectedOrder.products.map((product, index) => (
+                obj.map((product, index) => (
                   <li key={index} className="flex gap-5">
-                    <b>1x</b>
+                    <b>{product.quantity}x</b>
                     <ul>
-                      <li className="font-bold">{product}</li>
+                      <li className="font-bold">{product.name}</li>
                     </ul>
-                    <small>$0</small>
+                    <small>${product.price.toLocaleString()}</small>
                   </li>
                 ))
               ) : (
