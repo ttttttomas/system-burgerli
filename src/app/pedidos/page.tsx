@@ -1,15 +1,16 @@
 "use client";
-import {useState, useEffect, useRef} from "react";
+import { useState, useEffect, useRef } from "react";
 
 import OrderCard from "../components/OrderCard";
 import OrderReadyCard from "../components/OrderReadyCard";
 import PopupOrders from "../components/PopupOrders";
-import {useSession} from "../context/SessionContext";
+import { useSession } from "../context/SessionContext";
 
-import {Orders} from "@/types";
+import { Orders } from "@/types";
+import { toast } from "sonner";
 
 export default function HomePage() {
-  const {session} = useSession();
+  const { session } = useSession();
   const [newOrders, setNewOrders] = useState<Orders[]>([]); // Órdenes nuevas
   const [ordersInPreparation, setOrdersInPreparation] = useState<Orders[]>([]); // En preparación
   const [ordersReady, setOrdersReady] = useState<Orders[]>([]); // Listas para retirar
@@ -38,16 +39,24 @@ export default function HomePage() {
       }
 
       // Cargar órdenes en preparación
-      const savedOrdersInPrep = localStorage.getItem(`ordersInPreparation_${localKey}`);
+      const savedOrdersInPrep = localStorage.getItem(
+        `ordersInPreparation_${localKey}`,
+      );
 
       if (savedOrdersInPrep) {
         try {
           const parsed = JSON.parse(savedOrdersInPrep);
 
           setOrdersInPreparation(parsed);
-          console.log("📦 Órdenes en preparación cargadas desde localStorage:", parsed);
+          console.log(
+            "📦 Órdenes en preparación cargadas desde localStorage:",
+            parsed,
+          );
         } catch (e) {
-          console.error("❌ Error al parsear ordersInPreparation desde localStorage:", e);
+          console.error(
+            "❌ Error al parsear ordersInPreparation desde localStorage:",
+            e,
+          );
         }
       }
 
@@ -61,7 +70,10 @@ export default function HomePage() {
           setOrdersReady(parsed);
           console.log("📦 Órdenes listas cargadas desde localStorage:", parsed);
         } catch (e) {
-          console.error("❌ Error al parsear ordersReady desde localStorage:", e);
+          console.error(
+            "❌ Error al parsear ordersReady desde localStorage:",
+            e,
+          );
         }
       }
 
@@ -84,7 +96,10 @@ export default function HomePage() {
     if (isLoaded && typeof window !== "undefined" && session?.local) {
       const localKey = session.local.toLowerCase();
 
-      localStorage.setItem(`ordersInPreparation_${localKey}`, JSON.stringify(ordersInPreparation));
+      localStorage.setItem(
+        `ordersInPreparation_${localKey}`,
+        JSON.stringify(ordersInPreparation),
+      );
       console.log("💾 Órdenes en preparación guardadas en localStorage");
     }
   }, [ordersInPreparation, isLoaded, session?.local]);
@@ -94,43 +109,57 @@ export default function HomePage() {
     if (isLoaded && typeof window !== "undefined" && session?.local) {
       const localKey = session.local.toLowerCase();
 
-      localStorage.setItem(`ordersReady_${localKey}`, JSON.stringify(ordersReady));
+      localStorage.setItem(
+        `ordersReady_${localKey}`,
+        JSON.stringify(ordersReady),
+      );
       console.log("💾 Órdenes listas guardadas en localStorage");
     }
   }, [ordersReady, isLoaded, session?.local]);
 
   // Función para mover una orden a "En preparación"
   const moveToPreparation = (orderId: string) => {
-    console.log("🔄 Moviendo orden a preparación:", orderId);
+    console.log("🟦 Moviendo orden a preparación:", orderId);
 
     // Buscar la orden en newOrders
     const orderToMove = newOrders.find((order) => order.id_order === orderId);
 
     if (orderToMove) {
-      const newStatus = "En preparación";
+      const newStatus = "in_preparation";
 
       // Agregar a ordersInPreparation
-      setOrdersInPreparation((prev) => [...prev, {...orderToMove, status: newStatus}]);
+      setOrdersInPreparation((prev) => [
+        ...prev,
+        { ...orderToMove, status: newStatus },
+      ]);
 
       // Remover de newOrders
-      setNewOrders((prev) => prev.filter((order) => order.id_order !== orderId));
+      setNewOrders((prev) =>
+        prev.filter((order) => order.id_order !== orderId),
+      );
 
-      // Enviar actualización de estado por WebSocket
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        const statusUpdate = {
-          event: "status_update",
-          order_id: orderId,
-          status: newStatus,
-          local: orderToMove.local,
-        };
-
-        wsRef.current.send(JSON.stringify(statusUpdate));
-        console.log("📤 Estado actualizado enviado por WebSocket:", statusUpdate);
-      }
-
-      console.log("✅ Orden movida a preparación exitosamente");
-    } else {
-      console.error("❌ Orden no encontrada:", orderId);
+      // Enviar actualización de estado por API (PATCH)
+      fetch(`http://localhost:8000/${orderId}/status`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            const err = await res.json().catch(() => null);
+            throw new Error(err?.detail || `Error HTTP ${res.status}`);
+          }
+          return res.json();
+        })
+        .then((data) => {
+          console.log("✅ Estado actualizado vía PATCH:", data);
+        })
+        .catch((error) => {
+          console.error("❌ Error actualizando estado vía PATCH:", error);
+        });
     }
   };
 
@@ -139,33 +168,45 @@ export default function HomePage() {
     console.log("🔄 Moviendo orden a listo para retirar:", orderId);
 
     // Buscar la orden en ordersInPreparation
-    const orderToMove = ordersInPreparation.find((order) => order.id_order === orderId);
+    const orderToMove = ordersInPreparation.find(
+      (order) => order.id_order === orderId,
+    );
 
     if (orderToMove) {
-      const newStatus = "Listo para retirar";
+      const newStatus = "on_the_way";
 
       // Agregar a ordersReady
-      setOrdersReady((prev) => [...prev, {...orderToMove, status: newStatus}]);
+      setOrdersReady((prev) => [
+        ...prev,
+        { ...orderToMove, status: newStatus },
+      ]);
 
       // Remover de ordersInPreparation
-      setOrdersInPreparation((prev) => prev.filter((order) => order.id_order !== orderId));
-
-      // Enviar actualización de estado por WebSocket
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        const statusUpdate = {
-          event: "status_update",
-          order_id: orderId,
-          status: newStatus,
-          local: orderToMove.local,
-        };
-
-        wsRef.current.send(JSON.stringify(statusUpdate));
-        console.log("📤 Estado actualizado enviado por WebSocket:", statusUpdate);
-      }
-
-      console.log("✅ Orden movida a listo para retirar exitosamente");
-    } else {
-      console.error("❌ Orden no encontrada:", orderId);
+      setOrdersInPreparation((prev) =>
+        prev.filter((order) => order.id_order !== orderId),
+      );
+      // Enviar actualización de estado por API (PATCH)
+      fetch(`http://localhost:8000/${orderId}/status`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            const err = await res.json().catch(() => null);
+            throw new Error(err?.detail || `Error HTTP ${res.status}`);
+          }
+          return res.json();
+        })
+        .then((data) => {
+          console.log("✅ Estado actualizado vía PATCH:", data);
+        })
+        .catch((error) => {
+          console.error("❌ Error actualizando estado vía PATCH:", error);
+        });
     }
   };
 
@@ -174,30 +215,40 @@ export default function HomePage() {
     console.log("✅ Marcando orden como entregada:", orderId);
 
     // Buscar la orden en ordersReady
-    const orderToDeliver = ordersReady.find((order) => order.id_order === orderId);
+    const orderToDeliver = ordersReady.find(
+      (order) => order.id_order === orderId,
+    );
 
     if (orderToDeliver) {
-      const newStatus = "Entregado";
+      const newStatus = "delivered";
 
       // Remover de ordersReady
-      setOrdersReady((prev) => prev.filter((order) => order.id_order !== orderId));
+      setOrdersReady((prev) =>
+        prev.filter((order) => order.id_order !== orderId),
+      );
 
-      // Enviar actualización de estado por WebSocket
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        const statusUpdate = {
-          event: "status_update",
-          order_id: orderId,
-          status: newStatus,
-          local: orderToDeliver.local,
-        };
-
-        wsRef.current.send(JSON.stringify(statusUpdate));
-        console.log("📤 Estado actualizado enviado por WebSocket:", statusUpdate);
-      }
-
-      console.log("✅ Orden marcada como entregada y eliminada exitosamente");
-    } else {
-      console.error("❌ Orden no encontrada:", orderId);
+     // Enviar actualización de estado por API (PATCH)
+    fetch(`http://localhost:8000/${orderId}/status`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: newStatus }),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const err = await res.json().catch(() => null);
+          throw new Error(err?.detail || `Error HTTP ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log("✅ Estado actualizado vía PATCH:", data);
+      })
+      .catch((error) => {
+        console.error("❌ Error actualizando estado vía PATCH:", error);
+      });
     }
   };
 
@@ -227,7 +278,7 @@ export default function HomePage() {
 
       ws.onopen = () => {
         console.log("✅ Conexión establecida con el servidor WebSocket");
-        ws.send(JSON.stringify({event: "identify", type: "dashboard"}));
+        ws.send(JSON.stringify({ event: "identify", type: "dashboard" }));
         console.log("📤 Identificado como dashboard");
       };
 
@@ -245,10 +296,16 @@ export default function HomePage() {
             const pedidoLocal = msg.pedido?.local?.toLowerCase();
             const sessionLocal = session?.local?.toLowerCase();
 
-            console.log("🔍 Verificando local - Pedido:", pedidoLocal, "| Sesión:", sessionLocal);
+            console.log(
+              "🔍 Verificando local - Pedido:",
+              pedidoLocal,
+              "| Sesión:",
+              sessionLocal,
+            );
 
             // Solo agregar la orden si el local coincide con el local de la sesión
             if (pedidoLocal === sessionLocal) {
+              toast.success("Pedido agregado exitosamente");
               console.log(
                 "✅ Local coincide - Agregando pedido:",
                 msg.pedido,
@@ -256,7 +313,10 @@ export default function HomePage() {
                 msg.user_id,
               );
               // Agregar a newOrders (órdenes nuevas)
-              setNewOrders((prevOrders) => [...prevOrders, {...msg.pedido, status: "Nuevo"}]);
+              setNewOrders((prevOrders) => [
+                ...prevOrders,
+                { ...msg.pedido, status: "Nuevo" },
+              ]);
             } else {
               console.log(
                 "⚠️ Local no coincide - Pedido ignorado. Pedido local:",
@@ -268,13 +328,18 @@ export default function HomePage() {
           } else if (msg.event === "status_update") {
             console.log("🔄 Evento de actualización de estado recibido:", msg);
 
-            const {order_id, status, local} = msg;
+            const { order_id, status, local } = msg;
             const orderLocal = local?.toLowerCase();
             const sessionLocal = session?.local?.toLowerCase();
 
             // Solo procesar si es del mismo local
             if (orderLocal === sessionLocal) {
-              console.log("✅ Actualizando estado de orden:", order_id, "→", status);
+              console.log(
+                "✅ Actualizando estado de orden:",
+                order_id,
+                "→",
+                status,
+              );
 
               // Actualizar el estado según el nuevo status
               switch (status) {
@@ -284,7 +349,10 @@ export default function HomePage() {
                     const order = prev.find((o) => o.id_order === order_id);
 
                     if (order) {
-                      setOrdersInPreparation((prep) => [...prep, {...order, status}]);
+                      setOrdersInPreparation((prep) => [
+                        ...prep,
+                        { ...order, status },
+                      ]);
 
                       return prev.filter((o) => o.id_order !== order_id);
                     }
@@ -299,7 +367,10 @@ export default function HomePage() {
                     const order = prev.find((o) => o.id_order === order_id);
 
                     if (order) {
-                      setOrdersReady((ready) => [...ready, {...order, status}]);
+                      setOrdersReady((ready) => [
+                        ...ready,
+                        { ...order, status },
+                      ]);
 
                       return prev.filter((o) => o.id_order !== order_id);
                     }
@@ -310,7 +381,9 @@ export default function HomePage() {
 
                 case "Entregado":
                   // Remover de ordersReady
-                  setOrdersReady((prev) => prev.filter((o) => o.id_order !== order_id));
+                  setOrdersReady((prev) =>
+                    prev.filter((o) => o.id_order !== order_id),
+                  );
                   console.log("✅ Orden marcada como entregada y eliminada");
                   break;
 
@@ -318,7 +391,9 @@ export default function HomePage() {
                   console.warn("⚠️ Estado desconocido:", status);
               }
             } else {
-              console.log("⚠️ Actualización de estado ignorada - Local diferente");
+              console.log(
+                "⚠️ Actualización de estado ignorada - Local diferente",
+              );
             }
           }
         } catch (e) {
@@ -327,7 +402,12 @@ export default function HomePage() {
       };
 
       ws.onclose = (event) => {
-        console.log("🔌 Conexión WebSocket cerrada. Código:", event.code, "Razón:", event.reason);
+        console.log(
+          "🔌 Conexión WebSocket cerrada. Código:",
+          event.code,
+          "Razón:",
+          event.reason,
+        );
         wsRef.current = null;
 
         // Intentar reconectar automáticamente si shouldReconnect es true
@@ -376,7 +456,11 @@ export default function HomePage() {
       <section className="my-10 flex flex-wrap items-center justify-start gap-14">
         {ordersInPreparation.length > 0 ? (
           ordersInPreparation.map((order, index) => (
-            <OrderCard key={order.id_order || index} order={order} onMoveToReady={moveToReady} />
+            <OrderCard
+              key={order.id_order || index}
+              order={order}
+              onMoveToReady={moveToReady}
+            />
           ))
         ) : (
           <p className="text-gray-500">No hay pedidos en preparación.</p>
