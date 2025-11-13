@@ -1,11 +1,17 @@
-export function parseLineItems(rawArray: string[]) {
+export interface Product {
+  quantity: number;
+  name: string;
+  price: number;
+}
+
+export function parseLineItems(rawArray: string[]): Product[] {
   if (!Array.isArray(rawArray)) {
     console.error("❌ Esperaba un array y llegó:", rawArray);
     return [];
   }
 
   return rawArray
-    .map((item, index) => {
+    .map((item, index): Product | null => {
       if (typeof item !== "string") {
         console.warn(`⏭️ Salteo índice ${index} (no es string):`, item);
         return null;
@@ -24,11 +30,13 @@ export function parseLineItems(rawArray: string[]) {
       }
 
       try {
-        return JSON.parse(trimmed);
+        const parsed = JSON.parse(trimmed) as Product;
+        return parsed;
       } catch (e) {
-        console.error(`❌ Error parseando índice ${index}:`, trimmed, e.message);
+        const error = e as Error;
+        console.error(`❌ Error parseando índice ${index}:`, trimmed, error.message);
         return null;
       }
     })
-    .filter(Boolean); // saca los null
+    .filter((item): item is Product => item !== null); // saca los null con type guard
 }
