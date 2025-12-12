@@ -1,17 +1,23 @@
 "use client";
-import {useState} from "react";
+import { useState } from "react";
 
 import Cruz from "./Cruz";
 
-import {Orders} from "@/types";
+import { Orders } from "@/types";
 import { parseLineItems } from "@/lib/ProductsToJson";
+import TicketPrintButton from "./TicketPrinterButton";
 
 interface OrderReadyCardProps {
   order: Orders;
   onMarkAsDelivered: (orderId: string) => void;
+  onCancelOrder: (orderId: string) => void;
 }
 
-export default function OrderReadyCard({order, onMarkAsDelivered}: OrderReadyCardProps) {
+export default function OrderReadyCard({
+  order,
+  onMarkAsDelivered,
+  onCancelOrder,
+}: OrderReadyCardProps) {
   const [selectedOrder, setSelectedOrder] = useState<Orders | null>(null);
 
   const handleClick = () => {
@@ -25,6 +31,13 @@ export default function OrderReadyCard({order, onMarkAsDelivered}: OrderReadyCar
   const handleMarkAsDelivered = () => {
     if (order.id_order) {
       onMarkAsDelivered(order.id_order);
+      handleClick();
+    }
+  };
+
+  const handleCancelOrder = () => {
+    if (order.id_order) {
+      onCancelOrder(order.id_order);
       handleClick();
     }
   };
@@ -66,13 +79,19 @@ export default function OrderReadyCard({order, onMarkAsDelivered}: OrderReadyCar
             </div>
           </div>
           <section className="flex flex-col gap-1 px-5">
-            <h1 className="text-center text-2xl font-bold">Detalles del pedido</h1>
-            <p className="text-center">(#{selectedOrder.id_order?.slice(0, 10)})</p>
+            <h1 className="text-center text-2xl font-bold">
+              Detalles del pedido
+            </h1>
+            <p className="text-center">
+              (#{selectedOrder.id_order?.slice(0, 10)})
+            </p>
             <div className="flex items-center justify-between text-sm">
               <p>{new Date().toLocaleDateString()}</p>
               <p>{new Date().toLocaleTimeString()}</p>
             </div>
-            <h2 className="text-center font-bold underline">Datos del cliente</h2>
+            <h2 className="text-center font-bold underline">
+              Datos del cliente
+            </h2>
             <ul className="flex flex-col gap-1">
               <li>
                 Nombre: <b>{selectedOrder.name}</b>
@@ -89,7 +108,9 @@ export default function OrderReadyCard({order, onMarkAsDelivered}: OrderReadyCar
                 </li>
               )}
             </ul>
-            <h2 className="text-center font-bold underline">Forma de entrega</h2>
+            <h2 className="text-center font-bold underline">
+              Forma de entrega
+            </h2>
             <p>{selectedOrder.delivery_mode}</p>
             <h3 className="text-center font-bold underline">Pedido</h3>
             <ul className="flex flex-col gap-1">
@@ -111,24 +132,32 @@ export default function OrderReadyCard({order, onMarkAsDelivered}: OrderReadyCar
               <b>Total</b>
               <b>${selectedOrder.price.toLocaleString()}</b>
             </div>
-            <b>Pago: {selectedOrder.payment_method}</b>
+            <b>
+              Pago:
+              {selectedOrder.payment_method === "account_money"
+                ? "Mercado Pago"
+                : "Efectivo"}
+            </b>
             {selectedOrder.order_notes && (
               <>
-                <h3 className="my-5 text-center font-bold underline">Notas del cliente</h3>
+                <h3 className="my-5 text-center font-bold underline">
+                  Notas del cliente
+                </h3>
                 <p>{selectedOrder.order_notes}</p>
               </>
             )}
             <div className="flex flex-col gap-3">
               <button
-                className="rounded-xl bg-green-500 py-2 font-bold text-white"
+                className="rounded-xl cursor-pointer text-black hover:bg-green-500/50 bg-green-500 transition-all py-2 font-bold"
                 onClick={handleMarkAsDelivered}
               >
                 ✓ Pedido entregado
               </button>
-              <button className="rounded-xl border-2 border-dashed border-[#EEAA4B] py-2 font-bold text-black">
-                Imprimir ticket
-              </button>
-              <button className="rounded-xl bg-red-500 py-2 font-bold text-white">
+              <TicketPrintButton order={selectedOrder} />
+              <button
+                className="rounded-xl bg-red-500 py-2 font-bold text-white cursor-pointer hover:bg-red-600 transition-all"
+                onClick={handleCancelOrder}
+              >
                 Cancelar pedido
               </button>
             </div>

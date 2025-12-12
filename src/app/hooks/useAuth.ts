@@ -60,10 +60,27 @@ export default function useAuth() {
     }
   };
 
+  const deleteOrder = async (orderId: string) => {
+    try {
+      const response = await axios.delete(`http://localhost:8000/deleteOrder/${orderId}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+
+      console.log(response);
+      return response;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
+
   // const logout = async () => {
   //   await axios.post(`http://localhost:8000/logout`, {}, {withCredentials: true});
   //   setUser(null);
   // };
 
-  return {login, verifyCookie, getCurrentUser};
+  return {login, verifyCookie, getCurrentUser, deleteOrder};
 }

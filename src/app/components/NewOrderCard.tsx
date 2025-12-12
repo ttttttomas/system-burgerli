@@ -13,12 +13,14 @@ interface NewOrderCardProps {
   orderNumber?: string;
   timeAgo?: string;
   onMoveToPreparation: (orderId: string) => void;
+  onCancelOrder: (orderId: string) => void;
 }
 
 export default function NewOrderCard({
   order,
   timeAgo = "Hace un momento",
   onMoveToPreparation,
+  onCancelOrder,
 }: NewOrderCardProps) {
   const [selectedOrder, setSelectedOrder] = useState<Orders | null>(null);
 
@@ -37,6 +39,13 @@ export default function NewOrderCard({
   const handleMoveToPreparation = () => {
     if (order.id_order) {
       onMoveToPreparation(order.id_order);
+      closeModal();
+    }
+  };
+
+  const handleCancelOrder = () => {
+    if (order.id_order) {
+      onCancelOrder(order.id_order);
       closeModal();
     }
   };
@@ -83,7 +92,7 @@ export default function NewOrderCard({
               {/* Número de pedido */}
               <div className="text-center">
                 <h2 className="text-3xl font-bold">
-                  Pedido N° #{selectedOrder.id_order?.slice(0, 7)}
+                  Pedido N° #{selectedOrder.id_order?.slice(0, 10) + "..."}
                 </h2>
               </div>
 
@@ -152,7 +161,10 @@ export default function NewOrderCard({
                   <p>En preparación</p>
                   <span className="text-sm">Productos ({productCount})</span>
                 </button>
-                <button className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-500 py-3 font-bold text-white transition-all hover:bg-red-600">
+                <button 
+                  className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-500 py-3 font-bold text-white transition-all hover:bg-red-600"
+                  onClick={handleCancelOrder}
+                >
                   🗑️ Cancelar pedido
                 </button>
               </div>
@@ -175,7 +187,10 @@ export default function NewOrderCard({
                             <span className="font-bold">{product.quantity}x</span>
                             <div className="flex flex-col gap-1">
                               <p className="font-bold">{product.name}</p>
-                              {/* Aquí puedes agregar extras, sin, papas si vienen en el producto */}
+                              <div className="flex gap-2">
+                                <p className="font-normal">Tamaño:</p>
+                                <p>{product.size}</p>
+                              </div>
                             </div>
                           </div>
                           <span className="font-bold">${product.price.toLocaleString()}</span>

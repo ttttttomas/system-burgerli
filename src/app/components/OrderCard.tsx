@@ -4,6 +4,7 @@ import {useEffect, useRef, useState} from "react";
 import {Inter} from "next/font/google";
 import { parseLineItems } from "@/lib/ProductsToJson";
 import Cruz from "./Cruz";
+import TicketPrintButton from "./TicketPrinterButton";
 
 import {Orders} from "@/types";
 
@@ -26,9 +27,10 @@ function useLockBodyScroll(lock: boolean) {
 interface OrderCardProps {
   order: Orders;
   onMoveToReady: (orderId: string) => void;
+  onCancelOrder: (orderId: string) => void;
 }
 
-export default function OrderCard({order, onMoveToReady}: OrderCardProps) {
+export default function OrderCard({order, onMoveToReady, onCancelOrder}: OrderCardProps) {
   const [selectedOrder, setSelectedOrder] = useState<Orders | null>(null);
 
   // Referencia al contenedor para activar/desactivar 'inert'
@@ -66,6 +68,13 @@ export default function OrderCard({order, onMoveToReady}: OrderCardProps) {
 
   const handleClose = () => setSelectedOrder(null);
 
+  const handleDeleteOrder = () => {
+    if (selectedOrder?.id_order) {
+      onCancelOrder(selectedOrder.id_order);
+      handleClose();
+    }
+  };
+
   const openModal = (order: Orders) => {
     if (selectedOrder) return;
     setSelectedOrder(order);
@@ -96,7 +105,7 @@ export default function OrderCard({order, onMoveToReady}: OrderCardProps) {
             <b className="block">{order.name}</b>
           </div>
 
-          <div className="flex flex-col items-start">
+          <div className="flex flex-col overflow-y-scroll max-h-60 items-start">
             {/* Productos */}
             {order.products && order.products.length > 0 ? (
               obj.map((product, index) => (
@@ -104,6 +113,7 @@ export default function OrderCard({order, onMoveToReady}: OrderCardProps) {
                   <p className="mt-3 text-xl font-bold">{product.quantity}x</p>
                   <ul className="flex flex-col gap-1">
                     <li className="font-bold">{product.name}</li>
+                    <li className="font-bold">Tamaño: {product.size}</li>
                   </ul>
                 </div>
               ))
@@ -182,6 +192,7 @@ export default function OrderCard({order, onMoveToReady}: OrderCardProps) {
                       <b>{product.quantity}x</b>
                       <ul>
                         <li className="font-bold">{product.name}</li>
+                        <li>Tamaño: {product.size}</li>
                       </ul>
                       <small>${product.price.toLocaleString()}</small>
                     </li>
@@ -196,26 +207,26 @@ export default function OrderCard({order, onMoveToReady}: OrderCardProps) {
                 <b>${selectedOrder.price.toLocaleString()}</b>
               </div>
 
-              <b>Pago: {selectedOrder.payment_method}</b>
+              <b>Pago: {selectedOrder.payment_method === "account_money" ? "Mercado Pago" : "Efectivo"}</b>
 
               {selectedOrder.order_notes && (
                 <>
-                  <h3 className="my-5 text-center font-bold underline">Notas del cliente</h3>
+                  <h3 className="text-center font-bold underline">Notas del cliente</h3>
                   <p>{selectedOrder.order_notes}</p>
                 </>
               )}
 
               <div className="mt-2 flex flex-col gap-3">
                 <button
-                  className="rounded-xl bg-[#EEAA4B] py-2 font-bold text-black"
+                  className="rounded-xl cursor-pointer hover:bg-[#EEAA4B]/50 bg-[#EEAA4B] transition-all py-2 font-bold text-black"
                   onClick={handleMoveToReady}
                 >
                   Listo para entregar
                 </button>
-                <button className="rounded-xl border-2 border-dashed border-[#EEAA4B] py-2 font-bold text-black">
+                <button onClick={TicketPrintButton} className="rounded-xl border-2 border-dashed border-[#EEAA4B] py-2 font-bold text-black">
                   Imprimir ticket
                 </button>
-                <button className="rounded-xl bg-red-500 py-2 font-bold text-white">
+                <button onClick={handleDeleteOrder} className="rounded-xl bg-red-500 py-2 font-bold text-white">
                   Cancelar pedido
                 </button>
               </div>

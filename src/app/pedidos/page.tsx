@@ -5,12 +5,14 @@ import OrderCard from "../components/OrderCard";
 import OrderReadyCard from "../components/OrderReadyCard";
 import PopupOrders from "../components/PopupOrders";
 import { useSession } from "../context/SessionContext";
+import useAuth from "../hooks/useAuth";
 
 import { Orders } from "@/types";
 import { toast } from "sonner";
 
 export default function HomePage() {
   const { session } = useSession();
+  const { deleteOrder } = useAuth();
   const [newOrders, setNewOrders] = useState<Orders[]>([]); // Órdenes nuevas
   const [ordersInPreparation, setOrdersInPreparation] = useState<Orders[]>([]); // En preparación
   const [ordersReady, setOrdersReady] = useState<Orders[]>([]); // Listas para retirar
@@ -139,7 +141,7 @@ export default function HomePage() {
       );
 
       // Enviar actualización de estado por API (PATCH)
-      fetch(`https://api-burgerli.iwebtecnology.com/api/${orderId}/status`, {
+      fetch(`http://localhost:8000/${orderId}/status`, {
         method: "PATCH",
         credentials: "include",
         headers: {
@@ -186,7 +188,7 @@ export default function HomePage() {
         prev.filter((order) => order.id_order !== orderId),
       );
       // Enviar actualización de estado por API (PATCH)
-      fetch(`https://api-burgerli.iwebtecnology.com/api/${orderId}/status`, {
+      fetch(`http://localhost:8000/${orderId}/status`, {
         method: "PATCH",
         credentials: "include",
         headers: {
@@ -227,28 +229,81 @@ export default function HomePage() {
         prev.filter((order) => order.id_order !== orderId),
       );
 
-     // Enviar actualización de estado por API (PATCH)
-    fetch(`https://api-burgerli.iwebtecnology.com/api/${orderId}/status`, {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status: newStatus }),
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          const err = await res.json().catch(() => null);
-          throw new Error(err?.detail || `Error HTTP ${res.status}`);
-        }
-        return res.json();
+      // Enviar actualización de estado por API (PATCH)
+      fetch(`http://localhost:8000/${orderId}/status`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
       })
-      .then((data) => {
-        console.log("✅ Estado actualizado vía PATCH:", data);
-      })
-      .catch((error) => {
-        console.error("❌ Error actualizando estado vía PATCH:", error);
-      });
+        .then(async (res) => {
+          if (!res.ok) {
+            const err = await res.json().catch(() => null);
+            throw new Error(err?.detail || `Error HTTP ${res.status}`);
+          }
+          return res.json();
+        })
+        .then((data) => {
+          console.log("✅ Estado actualizado vía PATCH:", data);
+        })
+        .catch((error) => {
+          console.error("❌ Error actualizando estado vía PATCH:", error);
+        });
+    }
+  };
+
+  // Función para cancelar una orden desde cualquier estado
+  const cancelOrder = async (
+    orderId: string,
+    orderState: "new" | "preparation" | "ready",
+  ) => {
+    console.log("🗑️ Cancelando orden:", orderId, "desde estado:", orderState);
+
+    try {
+      // 1. Eliminar de la base de datos
+      await deleteOrder(orderId);
+
+      // 2. Remover del estado correspondiente (esto automáticamente actualiza localStorage)
+      switch (orderState) {
+        case "new":
+          setNewOrders((prev) =>
+            prev.filter((order) => order.id_order !== orderId),
+          );
+          console.log("✅ Orden removida de newOrders");
+          break;
+        case "preparation":
+          setOrdersInPreparation((prev) =>
+            prev.filter((order) => order.id_order !== orderId),
+          );
+          console.log("✅ Orden removida de ordersInPreparation");
+          break;
+        case "ready":
+          setOrdersReady((prev) =>
+            prev.filter((order) => order.id_order !== orderId),
+          );
+          console.log("✅ Orden removida de ordersReady");
+          break;
+      }
+
+      // 3. Enviar notificación por WebSocket para que el cliente sepa que se canceló
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(
+          JSON.stringify({
+            event: "order_cancelled",
+            order_id: orderId,
+            local: session?.local,
+          }),
+        );
+        console.log("📤 Notificación de cancelación enviada por WebSocket");
+      }
+
+      toast.success("Pedido cancelado exitosamente");
+      console.log("✅ Orden cancelada completamente");
+    } catch (error) {
+      console.error("❌ Error al cancelar orden:", error);
+      toast.error("Error al cancelar el pedido");
     }
   };
 
@@ -272,14 +327,17 @@ export default function HomePage() {
       }
 
       console.log("🔌 Intentando conectar WebSocket...");
-      const ws = new WebSocket("wss://api-burgerli.iwebtecnology.com/api/ws/orders");
+      // const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_BASE_URL;
+      
+      const ws = new WebSocket(`ws://localhost:8000/ws/orders`);
+      // const ws = new WebSocket("wss://api-burgerli.iwebtecnology.com/api/ws/orders")
 
       wsRef.current = ws;
 
       ws.onopen = () => {
         console.log("✅ Conexión establecida con el servidor WebSocket");
         ws.send(JSON.stringify({ event: "identify", type: "dashboard" }));
-        console.log("📤 Identificado como dashboard");
+        console.log("📤 Identificado como dashboard en:", ws.url);
       };
 
       ws.onerror = (error) => {
@@ -332,6 +390,8 @@ export default function HomePage() {
             const orderLocal = local?.toLowerCase();
             const sessionLocal = session?.local?.toLowerCase();
 
+            console.log(local,status,order_id);
+            
             // Solo procesar si es del mismo local
             if (orderLocal === sessionLocal) {
               console.log(
@@ -450,7 +510,11 @@ export default function HomePage() {
 
   return (
     <main className="ml-77 h-full font-bold text-black">
-      <PopupOrders orders={newOrders} onMoveToPreparation={moveToPreparation} />
+      <PopupOrders
+        orders={newOrders}
+        onMoveToPreparation={moveToPreparation}
+        onCancelOrder={(orderId: string) => cancelOrder(orderId, "new")}
+      />
       <h2 className="pt-5 text-2xl font-bold">Pedidos en preparación</h2>
       {/* LISTA DE PEDIDOS EN PREPARACION*/}
       <section className="my-10 flex flex-wrap items-center justify-start gap-14">
@@ -460,6 +524,9 @@ export default function HomePage() {
               key={order.id_order || index}
               order={order}
               onMoveToReady={moveToReady}
+              onCancelOrder={(orderId: string) =>
+                cancelOrder(orderId, "preparation")
+              }
             />
           ))
         ) : (
@@ -475,13 +542,21 @@ export default function HomePage() {
               key={order.id_order || index}
               order={order}
               onMarkAsDelivered={markAsDelivered}
+              onCancelOrder={(orderId: string) => cancelOrder(orderId, "ready")}
             />
           ))
         ) : (
           <p className="text-gray-500">No hay pedidos listos para retirar.</p>
         )}
       </section>
-      {session && <pre>{JSON.stringify(session, null, 2)}</pre>}
+      <footer>
+        <h6 className="text-3xl">Datos de la sesión:</h6>
+        <ul className="list-disc ml-10 flex flex-col gap-1">
+          <li>Local: {session?.local}</li>
+          <li>Usuario: {session?.username}</li>
+          <li>Rol: {session?.rol === "employed" ? "Empleado" : "Administrador"}</li>
+        </ul>
+      </footer>
     </main>
   );
 }

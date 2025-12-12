@@ -2,6 +2,7 @@ export interface Product {
   quantity: number;
   name: string;
   price: number;
+  size: string;
 }
 
 export function parseLineItems(rawArray: string[]): Product[] {

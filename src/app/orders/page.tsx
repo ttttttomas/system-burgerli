@@ -3,122 +3,40 @@ import {ArrowUpDown} from "lucide-react";
 
 import {useSession} from "../context/SessionContext";
 import Lupa from "../components/Lupa";
+import { useEffect, useState } from "react";
+import { Orders } from "@/types";
 
 export default function OrderPages() {
+  const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState<Orders[]>([]);
   const {session} = useSession();
-  const mockData = [
-    {
-      id: "#123456",
-      cliente: "Mariano Fernandez",
-      fecha: "08/09/25",
-      metodo: "Tarjeta",
-      estado: "Entregado",
-    },
-    {
-      id: "#123456",
-      cliente: "Martina Perez",
-      fecha: "08/09/25",
-      metodo: "Efectivo",
-      estado: "En preparación",
-    },
-    {
-      id: "#123456",
-      cliente: "Lucía Hernandez",
-      fecha: "08/09/25",
-      metodo: "Tarjeta",
-      estado: "En camino",
-    },
-    {
-      id: "#123456",
-      cliente: "Mariano Fernandez",
-      fecha: "08/09/25",
-      metodo: "Tarjeta",
-      estado: "Entregado",
-    },
-    {
-      id: "#123456",
-      cliente: "Martina Perez",
-      fecha: "08/09/25",
-      metodo: "Efectivo",
-      estado: "En preparación",
-    },
-    {
-      id: "#123456",
-      cliente: "Lucía Hernandez",
-      fecha: "08/09/25",
-      metodo: "Tarjeta",
-      estado: "En camino",
-    },
-    {
-      id: "#123456",
-      cliente: "Mariano Fernandez",
-      fecha: "08/09/25",
-      metodo: "Tarjeta",
-      estado: "Entregado",
-    },
-    {
-      id: "#123456",
-      cliente: "Martina Perez",
-      fecha: "08/09/25",
-      metodo: "Efectivo",
-      estado: "En preparación",
-    },
-    {
-      id: "#123456",
-      cliente: "Lucía Hernandez",
-      fecha: "08/09/25",
-      metodo: "Tarjeta",
-      estado: "En camino",
-    },
-    {
-      id: "#123456",
-      cliente: "Mariano Fernandez",
-      fecha: "08/09/25",
-      metodo: "Tarjeta",
-      estado: "Entregado",
-    },
-    {
-      id: "#123456",
-      cliente: "Martina Perez",
-      fecha: "08/09/25",
-      metodo: "Efectivo",
-      estado: "En preparación",
-    },
-    {
-      id: "#123456",
-      cliente: "Lucía Hernandez",
-      fecha: "08/09/25",
-      metodo: "Tarjeta",
-      estado: "En camino",
-    },
-    {
-      id: "#123456",
-      cliente: "Mariano Fernandez",
-      fecha: "08/09/25",
-      metodo: "Tarjeta",
-      estado: "Entregado",
-    },
-    {
-      id: "#123456",
-      cliente: "Martina Perez",
-      fecha: "08/09/25",
-      metodo: "Efectivo",
-      estado: "En preparación",
-    },
-    {
-      id: "#123456",
-      cliente: "Lucía Hernandez",
-      fecha: "08/09/25",
-      metodo: "Tarjeta",
-      estado: "En camino",
-    },
-    // ... repetí o mapeá más registros si querés
-  ];
+
+  const filteredData = (data: Orders[]) => {
+    return data.filter((item) => item.local.toLowerCase() === session?.local && item.status === "delivered");
+  };
+
+  useEffect(() => {
+    const local = session?.local;
+    console.log("local", local);
+    if (local) {
+      fetch(`http://localhost:8000/getOrders`)
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("data", data);
+          setOrders(filteredData(data));
+          setLoading(false);
+        });
+    }
+  }, [session]);
+
+  if (loading) {
+    return <div className="mr-8 ml-80 flex flex-col justify-start gap-5 text-black">Loading...</div>;
+  }
 
   return (
     <main className="mr-8 ml-80 flex flex-col justify-start gap-5 text-black">
       <h1 className="pt-5 text-2xl font-bold">Historial de pedidos - {session?.local}</h1>
-      <section className="flex items-center justify-start gap-20">
+      {/* <section className="flex items-center justify-start gap-20">
         <div className="flex w-max items-center gap-2 rounded-xl bg-[#EEAA4B] p-2">
           <Lupa />
           <input className="font-bold" placeholder="Buscar por ID" type="text" />
@@ -131,7 +49,7 @@ export default function OrderPages() {
           <Lupa />
           <input className="font-bold" placeholder="Buscar por fecha" type="text" />
         </div>
-      </section>
+      </section> */}
       <section className="w-full">
         <table className="w-full table-auto border-collapse rounded-md">
           <thead className="bg-[#3f2e1f] text-white">
@@ -150,16 +68,16 @@ export default function OrderPages() {
           </thead>
 
           <tbody className="bg-[#f5e6c8] text-sm text-black">
-            {mockData.map((row, i) => (
+            {orders.map((row, i) => (
               <tr
                 key={i}
                 className="border-t border-[#d9cbb3] transition-colors hover:bg-[#f3dbc0]"
               >
-                <td className="px-4 py-2">{row.id}</td>
-                <td className="px-4 py-2">{row.cliente}</td>
-                <td className="px-4 py-2">{row.fecha}</td>
-                <td className="px-4 py-2">{row.metodo}</td>
-                <td className="px-4 py-2">{row.estado}</td>
+                <td className="px-4 py-2">{row.id_order?.slice(0,10) + "..."}</td>
+                <td className="px-4 py-2">{row.name}</td>
+                <td className="px-4 py-2">{row.local}</td>
+                <td className="px-4 py-2">{row.payment_method}</td>
+                <td className="px-4 py-2">Entregado</td>
                 <td className="cursor-pointer px-4 py-2 font-semibold text-[#3f2e1f] hover:underline">
                   Más detalles
                 </td>

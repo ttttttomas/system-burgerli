@@ -1,4 +1,6 @@
+
 export default function AdminPage() {
+  
   const mockData = [
     {
       id: "#123456",
