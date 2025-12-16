@@ -8,7 +8,8 @@ type User = {
 export default function useAuth() {
   const login = async ({username, password}: User) => {
     const res = await axios.post(
-      `https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/token`,
+      // "http://localhost:8000/token",
+      `https://burgerli.ar/MdpuF8KsXiRArNlHtl6pXO2XyLSJMTQ8_Burgerli/api/token`,
       {username, password},
       {
         withCredentials: true,
@@ -30,7 +31,10 @@ export default function useAuth() {
 
   const verifyCookie = async () => {
     try {
-      const response = await axios.get(`https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/verify-cookie`, {
+      const response = await axios.get(
+        // "http://localhost:8000/verify-cookie"
+        `https://burgerli.ar/MdpuF8KsXiRArNlHtl6pXO2XyLSJMTQ8_Burgerli/api/verify-cookie`
+        , {
         headers: {
           "Content-Type": "application/json",
         },
@@ -47,7 +51,7 @@ export default function useAuth() {
 
   const getCurrentUser = async () => {
     try {
-      const response = await axios.get(`https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/me`, {
+      const response = await axios.get(`https://burgerli.ar/MdpuF8KsXiRArNlHtl6pXO2XyLSJMTQ8_Burgerli/api/me`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -62,7 +66,7 @@ export default function useAuth() {
 
   const deleteOrder = async (orderId: string) => {
     try {
-      const response = await axios.delete(`https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/deleteOrder/${orderId}`, {
+      const response = await axios.delete(`https://burgerli.ar/MdpuF8KsXiRArNlHtl6pXO2XyLSJMTQ8_Burgerli/api/deleteOrder/${orderId}`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -78,7 +82,7 @@ export default function useAuth() {
   };
 
   // const logout = async () => {
-  //   await axios.post(`https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/logout`, {}, {withCredentials: true});
+  //   await axios.post(`https://burgerli.ar/MdpuF8KsXiRArNlHtl6pXO2XyLSJMTQ8_Burgerli/api/logout`, {}, {withCredentials: true});
   //   setUser(null);
   // };
 
