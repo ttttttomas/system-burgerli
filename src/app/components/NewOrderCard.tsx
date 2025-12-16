@@ -29,7 +29,6 @@ export default function NewOrderCard({
   const openModal = (order: Orders) => {
     setSelectedOrder(order);
     console.log(order);
-    
   };
 
   const closeModal = () => {
@@ -49,11 +48,10 @@ export default function NewOrderCard({
       closeModal();
     }
   };
- 
 
   const obj = parseLineItems(order.products);
-
-
+  console.log(obj);
+  
 
   return (
     <>
@@ -161,7 +159,7 @@ export default function NewOrderCard({
                   <p>En preparación</p>
                   <span className="text-sm">Productos ({productCount})</span>
                 </button>
-                <button 
+                <button
                   className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-500 py-3 font-bold text-white transition-all hover:bg-red-600"
                   onClick={handleCancelOrder}
                 >
@@ -184,16 +182,28 @@ export default function NewOrderCard({
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex gap-3">
-                            <span className="font-bold">{product.quantity}x</span>
+                            <span className="font-bold">
+                              {product.quantity}x
+                            </span>
                             <div className="flex flex-col gap-1">
                               <p className="font-bold">{product.name}</p>
-                              <div className="flex gap-2">
+                              <div className="flex gap-2 items-center">
+                                <p className="font-normal">Papas:</p>
+                                <small>{product.fries}</small>
+                              </div>
+                              <div className="flex gap-2 items-center">
                                 <p className="font-normal">Tamaño:</p>
-                                <p>{product.size}</p>
+                                <small>{product.size}</small>
+                              </div>
+                              <div className="flex gap-2 items-center">
+                                <p className="font-normal">Sin:</p>
+                                <small>{product.sin.map((s) => s).join(", ")}</small>
                               </div>
                             </div>
                           </div>
-                          <span className="font-bold">${product.price.toLocaleString()}</span>
+                          <span className="font-bold">
+                            ${product.price.toLocaleString()}
+                          </span>
                         </div>
                       </div>
                     ))

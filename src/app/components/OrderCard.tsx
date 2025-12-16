@@ -4,7 +4,7 @@ import {useEffect, useRef, useState} from "react";
 import {Inter} from "next/font/google";
 import { parseLineItems } from "@/lib/ProductsToJson";
 import Cruz from "./Cruz";
-import TicketPrintButton from "./TicketPrinterButton";
+// import TicketPrintButton from "./TicketPrinterButton";
 
 import {Orders} from "@/types";
 
@@ -188,11 +188,13 @@ export default function OrderCard({order, onMoveToReady, onCancelOrder}: OrderCa
               <ul className="flex flex-col gap-1">
                 {selectedOrder.products && selectedOrder.products.length > 0 ? (
                   obj.map((product, index) => (
-                    <li key={index} className="flex gap-5">
+                    <li key={index} className="flex justify-between gap-5">
                       <b>{product.quantity}x</b>
                       <ul>
                         <li className="font-bold">{product.name}</li>
                         <li>Tamaño: {product.size}</li>
+                        <li>Sin: {product.sin.join(", ")}</li>
+                        <li>Papas: {product.fries}</li>
                       </ul>
                       <small>${product.price.toLocaleString()}</small>
                     </li>
@@ -223,7 +225,9 @@ export default function OrderCard({order, onMoveToReady, onCancelOrder}: OrderCa
                 >
                   Listo para entregar
                 </button>
-                <button onClick={TicketPrintButton} className="rounded-xl border-2 border-dashed border-[#EEAA4B] py-2 font-bold text-black">
+                <button
+                //  onClick={TicketPrintButton} 
+                 className="rounded-xl border-2 border-dashed border-[#EEAA4B] py-2 font-bold text-black">
                   Imprimir ticket
                 </button>
                 <button onClick={handleDeleteOrder} className="rounded-xl bg-red-500 py-2 font-bold text-white">

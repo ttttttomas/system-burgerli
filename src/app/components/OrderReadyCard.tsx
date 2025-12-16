@@ -5,7 +5,7 @@ import Cruz from "./Cruz";
 
 import { Orders } from "@/types";
 import { parseLineItems } from "@/lib/ProductsToJson";
-import TicketPrintButton from "./TicketPrinterButton";
+// import TicketPrintButton from "./TicketPrinterButton";
 
 interface OrderReadyCardProps {
   order: Orders;
@@ -116,7 +116,7 @@ export default function OrderReadyCard({
             <ul className="flex flex-col gap-1">
               {selectedOrder.products && selectedOrder.products.length > 0 ? (
                 obj.map((product, index) => (
-                  <li key={index} className="flex gap-5">
+                  <li key={index} className="flex justify-between gap-5">
                     <b>{product.quantity}x</b>
                     <ul>
                       <li className="font-bold">{product.name}</li>
@@ -153,7 +153,7 @@ export default function OrderReadyCard({
               >
                 ✓ Pedido entregado
               </button>
-              <TicketPrintButton order={selectedOrder} />
+              {/* <TicketPrintButton order={selectedOrder} /> */}
               <button
                 className="rounded-xl bg-red-500 py-2 font-bold text-white cursor-pointer hover:bg-red-600 transition-all"
                 onClick={handleCancelOrder}

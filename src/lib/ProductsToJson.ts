@@ -3,6 +3,8 @@ export interface Product {
   name: string;
   price: number;
   size: string;
+  sin: string[];
+  fries: string;
 }
 
 export function parseLineItems(rawArray: string[]): Product[] {
