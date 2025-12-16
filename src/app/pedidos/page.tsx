@@ -141,7 +141,7 @@ export default function HomePage() {
       );
 
       // Enviar actualización de estado por API (PATCH)
-      fetch(`http://localhost:8000/${orderId}/status`, {
+      fetch(`https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/${orderId}/status`, {
         method: "PATCH",
         credentials: "include",
         headers: {
@@ -188,7 +188,7 @@ export default function HomePage() {
         prev.filter((order) => order.id_order !== orderId),
       );
       // Enviar actualización de estado por API (PATCH)
-      fetch(`http://localhost:8000/${orderId}/status`, {
+      fetch(`https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/${orderId}/status`, {
         method: "PATCH",
         credentials: "include",
         headers: {
@@ -230,7 +230,7 @@ export default function HomePage() {
       );
 
       // Enviar actualización de estado por API (PATCH)
-      fetch(`http://localhost:8000/${orderId}/status`, {
+      fetch(`https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/${orderId}/status`, {
         method: "PATCH",
         credentials: "include",
         headers: {
@@ -329,7 +329,9 @@ export default function HomePage() {
       console.log("🔌 Intentando conectar WebSocket...");
       // const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_BASE_URL;
       
-      const ws = new WebSocket(`ws://localhost:8000/ws/orders`);
+      // const ws = new WebSocket(`ws://localhost:8000/ws/orders`);
+      const ws = new WebSocket(`wss://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/ws/orders`);
+
       // const ws = new WebSocket("wss://api-burgerli.iwebtecnology.com/api/ws/orders")
 
       wsRef.current = ws;
