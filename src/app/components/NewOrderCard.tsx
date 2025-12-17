@@ -51,7 +51,6 @@ export default function NewOrderCard({
 
   const obj = parseLineItems(order.products);
   console.log(obj);
-  
 
   return (
     <>
@@ -187,18 +186,25 @@ export default function NewOrderCard({
                             </span>
                             <div className="flex flex-col gap-1">
                               <p className="font-bold">{product.name}</p>
-                              <div className="flex gap-2 items-center">
-                                <p className="font-normal">Papas:</p>
-                                <small>{product.fries}</small>
-                              </div>
+                              {product.fries && (
+                                <div className="flex gap-2 items-center">
+                                  <p className="font-normal">Papas:</p>
+                                  <small>{product.fries}</small>
+                                </div>
+                              )}
                               <div className="flex gap-2 items-center">
                                 <p className="font-normal">Tamaño:</p>
                                 <small>{product.size}</small>
                               </div>
-                              <div className="flex gap-2 items-center">
-                                <p className="font-normal">Sin:</p>
-                                <small>{product.sin.map((s) => s).join(", ")}</small>
-                              </div>
+                              {Array.isArray(product.sin) &&
+                                product.sin.length > 0 && (
+                                  <div className="flex gap-2 items-center">
+                                    <p className="font-normal">Sin:</p>
+                                    <small>{product.sin.join(", ")}</small>
+                                  </div>
+                                )}
+                              {Array.isArray(product.sin) &&
+                                product.sin.length === 0 && null}
                             </div>
                           </div>
                           <span className="font-bold">
