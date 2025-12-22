@@ -22,8 +22,8 @@ export function buildReceipt(order: Orders) {
 
   let rawItems = order.products;
   const itemsArray = Array.isArray(rawItems) ? rawItems : [rawItems];
-  const commission = order.price * 0.08;
-  const subtotal = order.price - commission;
+  const subtotal = order.price
+  const total = order.price + 10000
 
   return (
     // Cambiamos el ancho a 32 para impresoras de 58mm
@@ -67,13 +67,13 @@ export function buildReceipt(order: Orders) {
       <Br />
       <Line />
       {/* Sección de desglose de precios */}
-      <Row left="Total" right={`$${subtotal.toFixed(2)}`} />
+      <Row left="Subtotal" right={`$${subtotal.toFixed(2)}`} />
       <Row left="Servicio" right={"$1.000"} />
       
       <Line />
       <Row 
         left={<Text bold>TOTAL</Text>} 
-        right={<Text bold>{`$${order.price}`}</Text>} 
+        right={<Text bold>{`$${total}`}</Text>} 
       />
       <Line />
       
