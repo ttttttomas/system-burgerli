@@ -17,32 +17,80 @@ export default function HomePage() {
   const [ordersInPreparation, setOrdersInPreparation] = useState<Orders[]>([]); // En preparación
   const [ordersReady, setOrdersReady] = useState<Orders[]>([]); // Listas para retirar
   const [isLoaded, setIsLoaded] = useState(false); // Para controlar la carga inicial
+  const [audioEnabled, setAudioEnabled] = useState(false); // Para controlar si el audio está habilitado
+  const [showAudioBanner, setShowAudioBanner] = useState(true); // Para mostrar el banner
+  const audioRef = useRef<HTMLAudioElement | null>(null); // Referencia al elemento de audio
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const shouldReconnectRef = useRef(true);
   const previousOrderCountRef = useRef<number>(0); // Para rastrear la cantidad anterior de pedidos
 
+  // Verificar si el audio ya fue habilitado previamente
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const audioWasEnabled = localStorage.getItem("audioNotificationsEnabled");
+      if (audioWasEnabled === "true") {
+        setAudioEnabled(true);
+        setShowAudioBanner(false);
+        // Precargar el audio
+        const audio = new Audio('/notification-sound.mp3');
+        audio.volume = 1.0;
+        audioRef.current = audio;
+        console.log("✅ Audio precargado desde localStorage");
+      }
+    }
+  }, []);
+
+  // Función para habilitar el audio con interacción del usuario
+  const enableAudioNotifications = () => {
+    const audio = new Audio('/notification-sound.mp3');
+    audio.volume = 1.0;
+    
+    // Reproducir y pausar inmediatamente para "desbloquear" el audio
+    audio.play()
+      .then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+        audioRef.current = audio;
+        setAudioEnabled(true);
+        setShowAudioBanner(false);
+        localStorage.setItem("audioNotificationsEnabled", "true");
+        console.log("✅ Notificaciones de audio habilitadas");
+        toast.success("Notificaciones de sonido activadas");
+      })
+      .catch((error) => {
+        console.error("❌ Error al habilitar audio:", error);
+        toast.error("No se pudo activar el sonido");
+      });
+  };
+  
   // Efecto para reproducir sonido cuando llega un nuevo pedido
   useEffect(() => {    
-    // Solo reproducir si hay más pedidos que antes y no es la carga inicial
-    if (isLoaded && newOrders.length > previousOrderCountRef.current) {
-      
-      // Crear y reproducir el audio
-      const audio = new Audio('/notification-sound.mp3');
-      audio.volume = 1.0; // Volumen al máximo para que se escuche bien en la cocina
+    // Solo reproducir si hay más pedidos que antes, no es la carga inicial, y el audio está habilitado
+    if (isLoaded && audioEnabled && newOrders.length > previousOrderCountRef.current) {
       
       console.log("🎵 Intentando reproducir audio...");
+      
+      // Usar el audio precargado o crear uno nuevo
+      const audio = audioRef.current || new Audio('/notification-sound.mp3');
+      audio.volume = 1.0;
+      audio.currentTime = 0; // Reiniciar al inicio
       
       audio.play()
         .then(() => {
           console.log("✅ Audio reproducido exitosamente");
         })
         .catch((error) => {
+          console.error("❌ Error al reproducir audio:", error);
           console.error("   - Mensaje:", error.message);
+          // Si falla, mostrar el banner nuevamente
+          setShowAudioBanner(true);
+          setAudioEnabled(false);
         });
     } else {
       console.log("⏭️ No se reproduce sonido:");
       if (!isLoaded) console.log("   - Razón: isLoaded es false (carga inicial)");
+      if (!audioEnabled) console.log("   - Razón: Audio no habilitado");
       if (newOrders.length <= previousOrderCountRef.current) {
         console.log("   - Razón: No hay incremento en pedidos");
         console.log("   - Anterior:", previousOrderCountRef.current, "| Actual:", newOrders.length);
@@ -51,7 +99,7 @@ export default function HomePage() {
     
     // Actualizar el contador de pedidos anterior
     previousOrderCountRef.current = newOrders.length;
-  }, [newOrders, isLoaded]);
+  }, [newOrders, isLoaded, audioEnabled]);
 
   // Cargar órdenes desde localStorage al montar el componente
   useEffect(() => {
@@ -542,6 +590,27 @@ export default function HomePage() {
 
   return (
     <main className="ml-77 h-full font-bold text-black">
+      {/* Banner para habilitar notificaciones de audio */}
+      {showAudioBanner && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-orange-500 text-white px-6 py-4 shadow-lg">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🔔</span>
+              <div>
+                <p className="font-bold text-lg">Habilitar notificaciones de sonido</p>
+                <p className="text-sm opacity-90">Haz clic aquí para recibir alertas sonoras cuando lleguen nuevos pedidos</p>
+              </div>
+            </div>
+            <button
+              onClick={enableAudioNotifications}
+              className="bg-white text-orange-500 px-6 py-2 rounded-lg font-bold hover:bg-orange-50 transition-colors"
+            >
+              Activar Sonido
+            </button>
+          </div>
+        </div>
+      )}
+      
       <PopupOrders
         orders={newOrders}
         onMoveToPreparation={moveToPreparation}
