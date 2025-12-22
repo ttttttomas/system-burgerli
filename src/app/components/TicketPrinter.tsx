@@ -40,6 +40,7 @@ export function buildReceipt(order: Orders) {
       <Text>Nombre: {order.name || "N/A"}</Text>
       {order.phone && <Text>Tel: {order.phone}</Text>}
       {order.email && <Text size={{ width: 1, height: 1 }}>Email: {order.email}</Text>}
+      {order.address && <Text size={{ width: 1, height: 1 }}>Dirección: {order.address}</Text>}
       <Line />
       
       <Row left="ORDEN" right={`#${order.id_order?.slice(-6)}`} />
@@ -66,8 +67,8 @@ export function buildReceipt(order: Orders) {
       <Br />
       <Line />
       {/* Sección de desglose de precios */}
-      <Row left="Subtotal" right={`$${subtotal.toFixed(2)}`} />
-      <Row left="Comisión (8%)" right={`$${commission.toFixed(2)}`} />
+      <Row left="Total" right={`$${subtotal.toFixed(2)}`} />
+      <Row left="Servicio" right={"$1.000"} />
       
       <Line />
       <Row 
