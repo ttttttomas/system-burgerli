@@ -1,61 +1,72 @@
-// components/TicketPrintButton.tsx
 "use client";
 
 import { useRef, useState } from "react";
-import type { Orders } from "@/types";
 import { render } from "react-thermal-printer";
-import { buildReceipt, TicketOrder } from "@/app/components/TicketPrinter";
+import { buildReceipt } from "@/app/components/TicketPrinter";
+import { Orders } from "@/types";
 
-interface Props {
-  order: TicketOrder;
-}
 
-export default function TicketPrintButton({ order }: Props) {
-  const portRef = useRef<any>(null);
+
+export default function TicketPrintButton({ order }: { order: Orders }) {
+  const characteristicRef = useRef<BluetoothRemoteGATTCharacteristic | null>(null);
   const [loading, setLoading] = useState(false);
   const [connected, setConnected] = useState(false);
 
   const connectPrinter = async () => {
-    if (!("serial" in navigator)) {
-      alert("Este navegador no soporta Web Serial API (Chrome/Edge desktop).");
-      return;
-    }
-
     try {
-      // usuario elige el puerto de la impresora
-      const port = await (navigator as any).serial.requestPort();
-      await port.open({ baudRate: 9600 }); // ajustá al baudrate de tu impresora
-      portRef.current = port;
+      // Usamos 'acceptAllDevices' para que aparezca en la lista sí o sí
+      const device = await (navigator as any).bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: [
+          "0000ff00-0000-1000-8000-00805f9b34fb", // El más común en impresoras térmicas
+          "000018f0-0000-1000-8000-00805f9b34fb"  // Alternativo
+        ]
+      });
+  
+      const server = await device.gatt.connect();
+      
+      // Intentamos obtener el servicio primario
+      const service = await server.getPrimaryService("0000ff00-0000-1000-8000-00805f9b34fb");
+      const characteristic = await service.getCharacteristic("0000ff02-0000-1000-8000-00805f9b34fb");
+  
+      characteristicRef.current = characteristic;
       setConnected(true);
+      alert("Conectado a: " + device.name);
     } catch (err) {
-      console.error(err);
-      alert("No se pudo conectar a la impresora.");
+      console.error("Error conectando:", err);
+      alert("Error de conexión. Revisa la consola.");
     }
   };
-
   const printTicket = async () => {
-    if (!portRef.current) {
+    if (!characteristicRef.current) {
       await connectPrinter();
-      if (!portRef.current) return;
+      if (!characteristicRef.current) return;
     }
 
     setLoading(true);
     try {
-      // 1) construir JSX del ticket
       const receipt = buildReceipt(order);
-
-      // 2) convertir a ESC/POS bytes
-      const data = await render(receipt); // Uint8Array
-
-      // 3) escribir al puerto serie
-      const writer = portRef.current.writable!.getWriter();
-      await writer.write(data);
-      writer.releaseLock();
-
-      alert("Ticket enviado a la impresora.");
+      const data = await render(receipt);
+  
+      const chunkSize = 20; 
+      for (let i = 0; i < data.length; i += chunkSize) {
+        const chunk = data.slice(i, i + chunkSize);
+        
+        // Intentamos usar el método más rápido y compatible
+        if (characteristicRef.current.writeValueWithoutResponse) {
+          await characteristicRef.current.writeValueWithoutResponse(chunk);
+        } else {
+          await characteristicRef.current.writeValue(chunk);
+        }
+  
+        // ESTO ES VITAL: Esperar 30ms entre paquetes para no saturar a la Global
+        await new Promise(r => setTimeout(r, 30)); 
+      }
+  
+      alert("¡Ticket impreso!");
     } catch (err) {
-      console.error(err);
-      alert("Error al imprimir el ticket.");
+      console.error("Error al imprimir:", err);
+      alert("Error de comunicación con la impresora.");
     } finally {
       setLoading(false);
     }
@@ -78,7 +89,7 @@ export default function TicketPrintButton({ order }: Props) {
           onClick={connectPrinter}
           className="px-3 py-2 rounded underline cursor-pointer border text-sm"
         >
-          Conectar impresora
+          Conectar impresora Bluetooth
         </button>
       )}
     </div>

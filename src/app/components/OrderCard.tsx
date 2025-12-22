@@ -7,6 +7,7 @@ import Cruz from "./Cruz";
 // import TicketPrintButton from "./TicketPrinterButton";
 
 import { Orders } from "@/types";
+import TicketPrintButton from "./TicketPrinterButton";
 
 const inter = Inter({ subsets: ["latin"], weight: "400" });
 
@@ -265,12 +266,7 @@ export default function OrderCard({
                 >
                   Listo para entregar
                 </button>
-                <button
-                  //  onClick={TicketPrintButton}
-                  className="rounded-xl border-2 border-dashed border-[#EEAA4B] py-2 font-bold text-black"
-                >
-                  Imprimir ticket
-                </button>
+                <TicketPrintButton order={selectedOrder} />
                 <button
                   onClick={handleDeleteOrder}
                   className="rounded-xl bg-red-500 py-2 font-bold text-white"

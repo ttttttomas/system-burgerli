@@ -5,6 +5,7 @@ import Cruz from "./Cruz";
 
 import { Orders } from "@/types";
 import { parseLineItems } from "@/lib/ProductsToJson";
+import TicketPrintButton from "./TicketPrinterButton";
 // import TicketPrintButton from "./TicketPrinterButton";
 
 interface OrderReadyCardProps {
@@ -153,7 +154,7 @@ export default function OrderReadyCard({
               >
                 ✓ Pedido entregado
               </button>
-              {/* <TicketPrintButton order={selectedOrder} /> */}
+              <TicketPrintButton order={selectedOrder} />
               <button
                 className="rounded-xl bg-red-500 py-2 font-bold text-white cursor-pointer hover:bg-red-600 transition-all"
                 onClick={handleCancelOrder}

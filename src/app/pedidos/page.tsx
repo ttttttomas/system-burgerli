@@ -20,6 +20,38 @@ export default function HomePage() {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const shouldReconnectRef = useRef(true);
+  const previousOrderCountRef = useRef<number>(0); // Para rastrear la cantidad anterior de pedidos
+
+  // Efecto para reproducir sonido cuando llega un nuevo pedido
+  useEffect(() => {    
+    // Solo reproducir si hay más pedidos que antes y no es la carga inicial
+    if (isLoaded && newOrders.length > previousOrderCountRef.current) {
+      
+      // Crear y reproducir el audio
+      const audio = new Audio('/notification-sound.mp3');
+      audio.volume = 1.0; // Volumen al máximo para que se escuche bien en la cocina
+      
+      console.log("🎵 Intentando reproducir audio...");
+      
+      audio.play()
+        .then(() => {
+          console.log("✅ Audio reproducido exitosamente");
+        })
+        .catch((error) => {
+          console.error("   - Mensaje:", error.message);
+        });
+    } else {
+      console.log("⏭️ No se reproduce sonido:");
+      if (!isLoaded) console.log("   - Razón: isLoaded es false (carga inicial)");
+      if (newOrders.length <= previousOrderCountRef.current) {
+        console.log("   - Razón: No hay incremento en pedidos");
+        console.log("   - Anterior:", previousOrderCountRef.current, "| Actual:", newOrders.length);
+      }
+    }
+    
+    // Actualizar el contador de pedidos anterior
+    previousOrderCountRef.current = newOrders.length;
+  }, [newOrders, isLoaded]);
 
   // Cargar órdenes desde localStorage al montar el componente
   useEffect(() => {
@@ -34,7 +66,6 @@ export default function HomePage() {
           const parsed = JSON.parse(savedNewOrders);
 
           setNewOrders(parsed);
-          console.log("📦 Órdenes nuevas cargadas desde localStorage:", parsed);
         } catch (e) {
           console.error("❌ Error al parsear newOrders desde localStorage:", e);
         }
@@ -50,15 +81,15 @@ export default function HomePage() {
           const parsed = JSON.parse(savedOrdersInPrep);
 
           setOrdersInPreparation(parsed);
-          console.log(
-            "📦 Órdenes en preparación cargadas desde localStorage:",
-            parsed,
-          );
+          // console.log(
+          //   "📦 Órdenes en preparación cargadas desde localStorage:",
+          //   parsed,
+          // );
         } catch (e) {
-          console.error(
-            "❌ Error al parsear ordersInPreparation desde localStorage:",
-            e,
-          );
+          // console.error(
+          //   "❌ Error al parsear ordersInPreparation desde localStorage:",
+          //   e,
+          // );
         }
       }
 
@@ -70,12 +101,12 @@ export default function HomePage() {
           const parsed = JSON.parse(savedOrdersReady);
 
           setOrdersReady(parsed);
-          console.log("📦 Órdenes listas cargadas desde localStorage:", parsed);
+          // console.log("📦 Órdenes listas cargadas desde localStorage:", parsed);
         } catch (e) {
-          console.error(
-            "❌ Error al parsear ordersReady desde localStorage:",
-            e,
-          );
+          // console.error(
+          //   "❌ Error al parsear ordersReady desde localStorage:",
+          //   e,
+          // );
         }
       }
 
@@ -89,7 +120,7 @@ export default function HomePage() {
       const localKey = session.local.toLowerCase();
 
       localStorage.setItem(`newOrders_${localKey}`, JSON.stringify(newOrders));
-      console.log("💾 Órdenes nuevas guardadas en localStorage");
+      // console.log("💾 Órdenes nuevas guardadas en localStorage");
     }
   }, [newOrders, isLoaded, session?.local]);
 
@@ -102,7 +133,7 @@ export default function HomePage() {
         `ordersInPreparation_${localKey}`,
         JSON.stringify(ordersInPreparation),
       );
-      console.log("💾 Órdenes en preparación guardadas en localStorage");
+      // console.log("💾 Órdenes en preparación guardadas en localStorage");
     }
   }, [ordersInPreparation, isLoaded, session?.local]);
 
@@ -115,13 +146,13 @@ export default function HomePage() {
         `ordersReady_${localKey}`,
         JSON.stringify(ordersReady),
       );
-      console.log("💾 Órdenes listas guardadas en localStorage");
+      // console.log("💾 Órdenes listas guardadas en localStorage");
     }
   }, [ordersReady, isLoaded, session?.local]);
 
   // Función para mover una orden a "En preparación"
   const moveToPreparation = (orderId: string) => {
-    console.log("🟦 Moviendo orden a preparación:", orderId);
+    // console.log("🟦 Moviendo orden a preparación:", orderId);
 
     // Buscar la orden en newOrders
     const orderToMove = newOrders.find((order) => order.id_order === orderId);
@@ -167,7 +198,7 @@ export default function HomePage() {
 
   // Función para mover una orden a "Listo para retirar"
   const moveToReady = (orderId: string) => {
-    console.log("🔄 Moviendo orden a listo para retirar:", orderId);
+    // console.log("🔄 Moviendo orden a listo para retirar:", orderId);
 
     // Buscar la orden en ordersInPreparation
     const orderToMove = ordersInPreparation.find(
@@ -214,7 +245,7 @@ export default function HomePage() {
 
   // Función para marcar una orden como entregada (eliminarla)
   const markAsDelivered = (orderId: string) => {
-    console.log("✅ Marcando orden como entregada:", orderId);
+    // console.log("✅ Marcando orden como entregada:", orderId);
 
     // Buscar la orden en ordersReady
     const orderToDeliver = ordersReady.find(
@@ -259,7 +290,7 @@ export default function HomePage() {
     orderId: string,
     orderState: "new" | "preparation" | "ready",
   ) => {
-    console.log("🗑️ Cancelando orden:", orderId, "desde estado:", orderState);
+    // console.log("🗑️ Cancelando orden:", orderId, "desde estado:", orderState);
 
     try {
       // 1. Eliminar de la base de datos
@@ -271,19 +302,19 @@ export default function HomePage() {
           setNewOrders((prev) =>
             prev.filter((order) => order.id_order !== orderId),
           );
-          console.log("✅ Orden removida de newOrders");
+          // console.log("✅ Orden removida de newOrders");
           break;
         case "preparation":
           setOrdersInPreparation((prev) =>
             prev.filter((order) => order.id_order !== orderId),
           );
-          console.log("✅ Orden removida de ordersInPreparation");
+          // console.log("✅ Orden removida de ordersInPreparation");
           break;
         case "ready":
           setOrdersReady((prev) =>
             prev.filter((order) => order.id_order !== orderId),
           );
-          console.log("✅ Orden removida de ordersReady");
+          // console.log("✅ Orden removida de ordersReady");
           break;
       }
 
@@ -296,11 +327,11 @@ export default function HomePage() {
             local: session?.local,
           }),
         );
-        console.log("📤 Notificación de cancelación enviada por WebSocket");
+        // console.log("📤 Notificación de cancelación enviada por WebSocket");
       }
 
       toast.success("Pedido cancelado exitosamente");
-      console.log("✅ Orden cancelada completamente");
+      // console.log("✅ Orden cancelada completamente");
     } catch (error) {
       console.error("❌ Error al cancelar orden:", error);
       toast.error("Error al cancelar el pedido");
@@ -310,12 +341,12 @@ export default function HomePage() {
   useEffect(() => {
     // No crear la conexión si la sesión aún no está disponible
     if (!session || !session.local) {
-      console.log("⏳ Esperando sesión... session:", session);
+      // console.log("⏳ Esperando sesión... session:", session);
 
       return;
     }
 
-    console.log("🔐 Sesión disponible - Local:", session.local);
+    // console.log("🔐 Sesión disponible - Local:", session.local);
 
     // Función para conectar/reconectar el WebSocket
     const connectWebSocket = () => {
@@ -339,7 +370,7 @@ export default function HomePage() {
       ws.onopen = () => {
         console.log("✅ Conexión establecida con el servidor WebSocket");
         ws.send(JSON.stringify({ event: "identify", type: "dashboard" }));
-        console.log("📤 Identificado como dashboard en:", ws.url);
+        // console.log("📤 Identificado como dashboard en:", ws.url);
       };
 
       ws.onerror = (error) => {
@@ -350,28 +381,28 @@ export default function HomePage() {
         try {
           const msg = JSON.parse(event.data);
 
-          console.log("📨 Mensaje recibido en dashboard:", msg);
+          // console.log("📨 Mensaje recibido en dashboard:", msg);
 
           if (msg.event === "new_order") {
             const pedidoLocal = msg.pedido?.local?.toLowerCase();
             const sessionLocal = session?.local?.toLowerCase();
 
-            console.log(
-              "🔍 Verificando local - Pedido:",
-              pedidoLocal,
-              "| Sesión:",
-              sessionLocal,
-            );
+            // console.log(
+            //   "🔍 Verificando local - Pedido:",
+            //   pedidoLocal,
+            //   "| Sesión:",
+            //   sessionLocal,
+            // );
 
             // Solo agregar la orden si el local coincide con el local de la sesión
             if (pedidoLocal === sessionLocal) {
               toast.success("Pedido agregado exitosamente");
-              console.log(
-                "✅ Local coincide - Agregando pedido:",
-                msg.pedido,
-                "Cliente:",
-                msg.user_id,
-              );
+              // console.log(
+              //   "✅ Local coincide - Agregando pedido:",
+              //   msg.pedido,
+              //   "Cliente:",
+              //   msg.user_id,
+              // );
               // Agregar a newOrders (órdenes nuevas)
               setNewOrders((prevOrders) => [
                 ...prevOrders,
@@ -386,13 +417,12 @@ export default function HomePage() {
               );
             }
           } else if (msg.event === "status_update") {
-            console.log("🔄 Evento de actualización de estado recibido:", msg);
+            // console.log("🔄 Evento de actualización de estado recibido:", msg);
 
             const { order_id, status, local } = msg;
             const orderLocal = local?.toLowerCase();
             const sessionLocal = session?.local?.toLowerCase();
 
-            console.log(local,status,order_id);
             
             // Solo procesar si es del mismo local
             if (orderLocal === sessionLocal) {
@@ -446,7 +476,7 @@ export default function HomePage() {
                   setOrdersReady((prev) =>
                     prev.filter((o) => o.id_order !== order_id),
                   );
-                  console.log("✅ Orden marcada como entregada y eliminada");
+                  // console.log("✅ Orden marcada como entregada y eliminada");
                   break;
 
                 default:
