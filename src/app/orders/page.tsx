@@ -8,6 +8,8 @@ import { Orders } from "@/types";
 import Cruz from "../components/Cruz";
 import { parseLineItems } from "@/lib/ProductsToJson";
 import TicketPrintButton from "../components/TicketPrinterButton";
+import PopupOrders from "../components/PopupOrders";
+
 
 export default function OrderPages() {
   const [loading, setLoading] = useState(true);
@@ -24,28 +26,28 @@ export default function OrderPages() {
   };
   
   
-
   const filteredData = (data: Orders[]) => {
     return data.filter((item) => item.local.toLowerCase() === session?.local && item.status === "delivered");
   };
-
+  
   useEffect(() => {
     const local = session?.local;
     console.log("local", local);
     if (local) {
       fetch(`https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/getOrders`)
-        .then((res) => res.json())
-        .then((data) => {
-          setOrders(filteredData(data));
-          setLoading(false);
-        });
+      .then((res) => res.json())
+      .then((data) => {
+        setOrders(filteredData(data));
+        setLoading(false);
+      });
     }
   }, [session]);
-
+  
   if (loading) {
     return <div className="mr-8 ml-80 flex flex-col justify-start gap-5 text-black">Loading...</div>;
   }
-
+  
+  const obj = parseLineItems(orders[0].products);
 
   return (
     <main className="mr-8 ml-80 flex flex-col justify-start gap-5 text-black">
@@ -68,7 +70,7 @@ export default function OrderPages() {
         <table className="w-full table-auto border-collapse rounded-md">
           <thead className="bg-[#3f2e1f] text-white">
             <tr>
-              {["ID", "Cliente", "Fecha", "Metodo de pago", "Estado", "Más detalles"].map(
+              {["ID", "Cliente", "Local", "Metodo de pago", "Estado", "Más detalles"].map(
                 (header, i) => (
                   <th key={i} className="px-4 py-2 text-left font-medium whitespace-nowrap">
                     <div className="flex items-center gap-1">
@@ -143,9 +145,9 @@ export default function OrderPages() {
                   <h2 className="text-center font-bold underline">
                     Forma de entrega
                   </h2>
-                  <p>{selectedOrder.delivery_mode}</p>
-                  <h3 className="text-center font-bold underline">Pedido</h3>
-                  {/* <ul className="flex flex-col gap-1">
+                  <p>{selectedOrder.delivery_mode === "pickup" ? 'Retiro en local' : 'Delivery'}</p>
+                  <h3 className="text-center font-bold underline my-2">Pedido</h3>
+                  <ul className="flex flex-col gap-5">
                     {selectedOrder.products && selectedOrder.products.length > 0 ? (
                       obj.map((product, index) => (
                         <li key={index} className="flex justify-between gap-5">
@@ -159,16 +161,16 @@ export default function OrderPages() {
                     ) : (
                       <li>No hay productos</li>
                     )}
-                  </ul> */}
+                  </ul>
                   <div className="my-2 flex items-center justify-between text-lg">
                     <b>Total</b>
-                    {/* <b>${selectedOrder.price.toLocaleString()}</b> */}
+                    <b>${selectedOrder.price.toLocaleString()}</b>
                   </div>
                   <b>
-                    Pago:
+                    Pago: 
                     {selectedOrder.payment_method === "account_money"
-                      ? "Mercado Pago"
-                      : "Efectivo"}
+                      ? " Mercado Pago"
+                      : " Efectivo"}
                   </b>
                   {selectedOrder.order_notes && (
                     <>
@@ -178,7 +180,7 @@ export default function OrderPages() {
                       <p>{selectedOrder.order_notes}</p>
                     </>
                   )}
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-5 my-1">
                     <TicketPrintButton order={selectedOrder} />
                   </div>
                 </section>

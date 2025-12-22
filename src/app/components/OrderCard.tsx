@@ -207,7 +207,7 @@ export default function OrderCard({
               <h2 className="text-center font-bold underline">
                 Forma de entrega
               </h2>
-              <p>{selectedOrder.delivery_mode}</p>
+              <p>{selectedOrder.delivery_mode == "pickup" ? 'Retiro en local' : 'Delivery'}</p>
 
               <h3 className="text-center font-bold underline">Pedido</h3>
               <ul className="flex flex-col gap-1">
@@ -217,7 +217,7 @@ export default function OrderCard({
                       <b>{product.quantity}x</b>
                       <ul>
                         <li className="font-bold">{product.name}</li>
-                        <li>Tamaño: {product.size}</li>
+                        {product.size && <li>Tamaño: {product.size}</li>}
                         {Array.isArray(product.sin) &&
                           product.sin.length > 0 && (
                             <div className="flex gap-2 items-center">

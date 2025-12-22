@@ -112,7 +112,7 @@ export default function OrderReadyCard({
             <h2 className="text-center font-bold underline">
               Forma de entrega
             </h2>
-            <p>{selectedOrder.delivery_mode}</p>
+            <p>{selectedOrder.delivery_mode === "pickup" ? 'Retiro en local' : 'Delivery'}</p>
             <h3 className="text-center font-bold underline">Pedido</h3>
             <ul className="flex flex-col gap-1">
               {selectedOrder.products && selectedOrder.products.length > 0 ? (

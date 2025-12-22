@@ -127,7 +127,7 @@ export default function NewOrderCard({
                 <h3 className="text-xl font-bold">Forma de entrega</h3>
                 <div className="flex items-center gap-2">
                   <span>
-                    {selectedOrder.delivery_mode === "Delivery" ? (
+                    {selectedOrder.delivery_mode === "delivery" ? (
                       <Moto />
                     ) : (
                       <span>
@@ -135,7 +135,7 @@ export default function NewOrderCard({
                       </span>
                     )}
                   </span>
-                  <span>{selectedOrder.delivery_mode}</span>
+                  <span>{selectedOrder.delivery_mode === "pickup" ? 'Retiro en local' : 'Delivery'}</span>
                 </div>
               </div>
 
@@ -193,8 +193,12 @@ export default function NewOrderCard({
                                 </div>
                               )}
                               <div className="flex gap-2 items-center">
+                                {product.size && 
+                                <>
                                 <p className="font-normal">Tamaño:</p>
                                 <small>{product.size}</small>
+                                </>
+                                }
                               </div>
                               {Array.isArray(product.sin) &&
                                 product.sin.length > 0 && (
