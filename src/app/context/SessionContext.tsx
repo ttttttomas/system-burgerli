@@ -3,12 +3,14 @@ import {createContext, useContext, useEffect, useState} from "react";
 
 import useAuth from "@/app/hooks/useAuth";
 import {SessionUser} from "@/types";
+import { toast } from "sonner";
 
 type LoginResult = {id: string};
 
 type Ctx = {
   session: SessionUser | null;
   loading: boolean;
+  logoutUser: () => Promise<void>;
   loginUser: (username: string, password: string) => Promise<LoginResult>;
 };
 
@@ -23,9 +25,42 @@ export function useSession() {
 }
 
 export function SessionContextProvider({children}: {children: React.ReactNode}) {
-  const {login, verifyCookie} = useAuth();
+  const {login, verifyCookie, logout} = useAuth();
   const [session, setSession] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState<boolean>(true); // Iniciar en true para mostrar loading inicial
+
+  const logoutUser = async () => {
+    setLoading(true);
+    try {
+      // 1. Llamar al endpoint del backend para borrar la cookie del servidor
+      await logout();
+      
+      // 2. Llamar al endpoint de Next.js para borrar cookies del lado del cliente
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'include',
+        });
+      } catch (e) {
+        console.warn("⚠️ No se pudo llamar al endpoint de logout de Next.js");
+      }
+      
+      // 3. Limpiar la sesión del contexto
+      setSession(null);
+      console.log("✅ Sesión cerrada correctamente");
+      toast.success("Sesión cerrada correctamente");
+      
+      // 4. Esperar un momento antes de continuar
+      await new Promise((resolve) => setTimeout(resolve, 150));
+    } catch (error) {
+      console.error("❌ Error during logout:", error);
+      // Aún así limpiar la sesión local
+      setSession(null);
+      toast.error("Error al cerrar sesión, pero se limpió localmente.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Verificar si hay un usuario iniciado
   const checkAuthentication = async () => {
@@ -84,7 +119,7 @@ export function SessionContextProvider({children}: {children: React.ReactNode}) 
   }, []);
 
   return (
-    <SessionContext.Provider value={{session, loginUser, loading}}>
+    <SessionContext.Provider value={{session, logoutUser, loginUser, loading}}>
       {children}
     </SessionContext.Provider>
   );
