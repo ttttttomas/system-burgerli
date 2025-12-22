@@ -1,14 +1,12 @@
 "use client";
-import {ArrowUpDown} from "lucide-react";
-
 import {useSession} from "../context/SessionContext";
-import Lupa from "../components/Lupa";
 import { useEffect, useState } from "react";
 import { Orders } from "@/types";
 import Cruz from "../components/Cruz";
 import { parseLineItems } from "@/lib/ProductsToJson";
 import TicketPrintButton from "../components/TicketPrinterButton";
 import PopupOrders from "../components/PopupOrders";
+import { useOrders } from "../context/OrdersContext";
 
 
 export default function OrderPages() {
@@ -16,6 +14,7 @@ export default function OrderPages() {
   const [orders, setOrders] = useState<Orders[]>([]);
   const {session} = useSession();
   const [selectedOrder, setSelectedOrder] = useState<Orders | null>(null);
+  const { newOrders, moveToPreparation, cancelOrder } = useOrders();
 
   const openModal = (order: Orders) => {
     setSelectedOrder(order);
@@ -47,10 +46,15 @@ export default function OrderPages() {
     return <div className="mr-8 ml-80 flex flex-col justify-start gap-5 text-black">Loading...</div>;
   }
   
-  const obj = parseLineItems(orders[0].products);
+  const obj = orders.length > 0 ? parseLineItems(orders[0].products) : [];
 
   return (
     <main className="mr-8 ml-80 flex flex-col justify-start gap-5 text-black">
+      <PopupOrders
+        orders={newOrders}
+        onMoveToPreparation={moveToPreparation}
+        onCancelOrder={(orderId: string) => cancelOrder(orderId, "new")}
+      />
       <h1 className="pt-5 text-2xl font-bold">Historial de pedidos - {session?.local}</h1>
       {/* <section className="flex items-center justify-start gap-20">
         <div className="flex w-max items-center gap-2 rounded-xl bg-[#EEAA4B] p-2">

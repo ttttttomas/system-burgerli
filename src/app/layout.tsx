@@ -4,6 +4,8 @@ import { Roboto } from "next/font/google";
 
 import "./globals.css";
 import { SessionContextProvider } from "@/app/context/SessionContext";
+import { OrdersContextProvider } from "@/app/context/OrdersContext";
+import { Toaster } from "sonner";
 
 import Aside from "./components/Aside";
 const roboto = Roboto({
@@ -25,10 +27,13 @@ export default async function RootLayout({
   return (
     <html lang="es">
       <SessionContextProvider>
-        <body className={`${roboto.className} h-full bg-white antialiased`}>
-          <Aside />
-          {children}
-        </body>
+        <OrdersContextProvider>
+          <body className={`${roboto.className} h-full bg-white antialiased`}>
+            <Toaster position="top-center" richColors />
+            <Aside />
+            {children}
+          </body>
+        </OrdersContextProvider>
       </SessionContextProvider>
     </html>
   );
