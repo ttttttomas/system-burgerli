@@ -245,9 +245,9 @@ export default function OrderCard({
 
               <b>
                 Pago:{" "}
-                {selectedOrder.payment_method === "account_money"
-                  ? "Mercado Pago"
-                  : "Efectivo"}
+                 {selectedOrder.payment_method === "Efectivo"
+                      ? " Efectivo"
+                      : " Mercado Pago"}
               </b>
 
               {selectedOrder.order_notes && (

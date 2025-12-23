@@ -234,7 +234,9 @@ export default function NewOrderCard({
                 <div className="mt-3 flex items-center justify-center gap-5 text-sm">
                   <span>Pago:</span>
                   <div className="flex items-center gap-2">
-                    <span>{selectedOrder.payment_method}</span>
+                    <span> {selectedOrder.payment_method === "Efectivo"
+                      ? " Efectivo"
+                      : " Mercado Pago"}</span>
                     <span>
                       <Tarjeta />
                     </span>
