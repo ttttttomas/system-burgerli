@@ -23,7 +23,7 @@ export function buildReceipt(order: Orders) {
   let rawItems = order.products;
   const itemsArray = Array.isArray(rawItems) ? rawItems : [rawItems];
   const subtotal = order.price
-  const total = order.price + 10000
+  const total = order.price + 1000
 
   return (
     // Cambiamos el ancho a 32 para impresoras de 58mm
