@@ -62,6 +62,11 @@ export function buildReceipt(order: Orders) {
             {/* Si tienes extras como 'fries' o 'size', puedes agregarlos aquí en pequeño */}
             {p.size && <Text size={{ width: 1, height: 1 }}> + Tamaño: {p.size}</Text>}
             {p.fries && <Text size={{ width: 1, height: 1 }}> + Papas: {p.fries}</Text>}
+            {p.selectedOptions && p.selectedOptions.length > 0 && (
+              <Text size={{ width: 1, height: 1 }}>
+                + Opciones: {p.selectedOptions.join(", ")}
+              </Text>
+            )}
           </React.Fragment>
         );
       })}

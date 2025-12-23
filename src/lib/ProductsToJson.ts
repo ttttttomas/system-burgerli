@@ -1,4 +1,5 @@
 export interface Product {
+  selectedOptions: string[];
   quantity: number;
   name: string;
   price: number;

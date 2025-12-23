@@ -120,9 +120,12 @@ export default function OrderReadyCard({
                   <li key={index} className="flex justify-between gap-5">
                     <b>{product.quantity}x</b>
                     <ul>
-                      <li className="font-bold">{product.name}</li>
-                      <li className="text-sm">Tamaño: {product.size}</li>
-                      <li className="text-sm">Papas: {product.fries}</li>
+                      <li className="">{product.name}</li>
+                      {product.selectedOptions && product.selectedOptions.length > 0 && (
+                        <li className="text-sm">Opciones: {product.selectedOptions.join(", ")}</li>
+                      )}
+                      {product.size && <li className="text-sm">Tamaño: {product.size}</li>}
+                      {product.fries && <li className="text-sm">Papas: {product.fries}</li>}
                     </ul>
                     <small>${product.price.toLocaleString()}</small>
                   </li>

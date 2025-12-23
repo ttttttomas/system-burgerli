@@ -135,7 +135,11 @@ export default function NewOrderCard({
                       </span>
                     )}
                   </span>
-                  <span>{selectedOrder.delivery_mode === "pickup" ? 'Retiro en local' : 'Delivery'}</span>
+                  <span>
+                    {selectedOrder.delivery_mode === "pickup"
+                      ? "Retiro en local"
+                      : "Delivery"}
+                  </span>
                 </div>
               </div>
 
@@ -186,6 +190,13 @@ export default function NewOrderCard({
                             </span>
                             <div className="flex flex-col gap-1">
                               <p className="font-bold">{product.name}</p>
+                              {product.selectedOptions &&
+                                product.selectedOptions.length > 0 && (
+                                  <p className="font-bold">
+                                    Opciones:{" "}
+                                    {product.selectedOptions.join(", ")}
+                                  </p>
+                                )}
                               {product.fries && (
                                 <div className="flex gap-2 items-center">
                                   <p className="font-normal">Papas:</p>
@@ -193,12 +204,12 @@ export default function NewOrderCard({
                                 </div>
                               )}
                               <div className="flex gap-2 items-center">
-                                {product.size && 
-                                <>
-                                <p className="font-normal">Tamaño:</p>
-                                <small>{product.size}</small>
-                                </>
-                                }
+                                {product.size && (
+                                  <>
+                                    <p className="font-normal">Tamaño:</p>
+                                    <small>{product.size}</small>
+                                  </>
+                                )}
                               </div>
                               {Array.isArray(product.sin) &&
                                 product.sin.length > 0 && (
@@ -208,7 +219,8 @@ export default function NewOrderCard({
                                   </div>
                                 )}
                               {Array.isArray(product.sin) &&
-                                product.sin.length === 0 && null}
+                                product.sin.length === 0 &&
+                                null}
                             </div>
                           </div>
                           <span className="font-bold">
@@ -234,9 +246,12 @@ export default function NewOrderCard({
                 <div className="mt-3 flex items-center justify-center gap-5 text-sm">
                   <span>Pago:</span>
                   <div className="flex items-center gap-2">
-                    <span> {selectedOrder.payment_method === "Efectivo"
-                      ? " Efectivo"
-                      : " Mercado Pago"}</span>
+                    <span>
+                      {" "}
+                      {selectedOrder.payment_method === "Efectivo"
+                        ? " Efectivo"
+                        : " Mercado Pago"}
+                    </span>
                     <span>
                       <Tarjeta />
                     </span>

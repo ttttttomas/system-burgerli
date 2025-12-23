@@ -29,12 +29,11 @@ export default function OrderPages() {
   
   
   const filteredData = (data: Orders[]) => {
-    return data.filter((item) => item.local.toLowerCase() === session?.local && item.status === "delivered");
+    return data.filter((item) => item.local.toLowerCase() === session?.local.toLowerCase() && item.status === "delivered");
   };
   
   useEffect(() => {
     const local = session?.local;
-    console.log("local", local);
     if (local) {
       fetch(`https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/getOrders`)
       .then((res) => res.json())

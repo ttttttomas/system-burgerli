@@ -124,7 +124,8 @@ export default function OrderCard({
                   <p className="mt-3 text-xl font-bold">{product.quantity}x</p>
                   <ul className="flex flex-col gap-1">
                     <li className="font-bold">{product.name}</li>
-                    <li className="font-bold">Tamaño: {product.size}</li>
+                    {product.size && <li>Tamaño: {product.size}</li>}
+                    {product.selectedOptions && product.selectedOptions.length > 0 && ( <li>Opciones: {product.selectedOptions.join(", ")}</li> )}
                   </ul>
                 </div>
               ))
@@ -218,6 +219,12 @@ export default function OrderCard({
                       <ul>
                         <li className="font-bold">{product.name}</li>
                         {product.size && <li>Tamaño: {product.size}</li>}
+                        {product.selectedOptions && product.selectedOptions.length > 0 && (
+                          <div className="flex gap-2 items-center">
+                            <small className="font-semibold">Opciones:</small>
+                            <small>{product.selectedOptions.join(", ")}</small>
+                          </div>
+                        )}
                         {Array.isArray(product.sin) &&
                           product.sin.length > 0 && (
                             <div className="flex gap-2 items-center">
