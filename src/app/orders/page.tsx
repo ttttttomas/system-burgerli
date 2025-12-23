@@ -16,8 +16,11 @@ export default function OrderPages() {
   const [selectedOrder, setSelectedOrder] = useState<Orders | null>(null);
   const { newOrders, moveToPreparation, cancelOrder } = useOrders();
 
+  
+
   const openModal = (order: Orders) => {
     setSelectedOrder(order);
+
   };
 
   const handleClick = () => {
@@ -47,7 +50,8 @@ export default function OrderPages() {
   }
   
   const obj = orders.length > 0 ? parseLineItems(orders[0].products) : [];
-
+  console.log(obj);
+  
   return (
     <main className="mr-8 ml-80 flex flex-col justify-start gap-5 text-black">
       <PopupOrders
@@ -96,7 +100,7 @@ export default function OrderPages() {
                 <td className="px-4 py-2">{row.id_order?.slice(0,10) + "..."}</td>
                 <td className="px-4 py-2">{row.name}</td>
                 <td className="px-4 py-2">{row.local}</td>
-                <td className="px-4 py-2">{row.payment_method}</td>
+                <td className="px-4 py-2">{row.payment_method === "account_money" ? "Mercado Pago" : "Efectivo"}</td>
                 <td className="px-4 py-2">Entregado</td>
                 <td className="px-4 py-2 font-semibold text-[#3f2e1f]">
                   <button onClick={() => openModal(row)} className="cursor-pointer  hover:underline">Más detalles</button>
@@ -158,6 +162,8 @@ export default function OrderPages() {
                           <b>{product.quantity}x</b>
                           <ul>
                             <li className="font-bold">{product.name}</li>
+                            <li className="text-sm">Tamaño: {product.size}</li>
+                            <li className="text-sm">Papas: {product.fries}</li>
                           </ul>
                           <small>${product.price.toLocaleString()}</small>
                         </li>

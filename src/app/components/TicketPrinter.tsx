@@ -59,7 +59,8 @@ export function buildReceipt(order: Orders) {
               right={`$${p.price}`}
             />
             {/* Si tienes extras como 'fries' o 'size', puedes agregarlos aquí en pequeño */}
-            {p.fries && <Text size={{ width: 1, height: 1 }}> + {p.fries}</Text>}
+            {p.size && <Text size={{ width: 1, height: 1 }}> + Tamaño: {p.size}</Text>}
+            {p.fries && <Text size={{ width: 1, height: 1 }}> + Papas: {p.fries}</Text>}
           </React.Fragment>
         );
       })}

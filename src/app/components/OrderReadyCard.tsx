@@ -121,6 +121,8 @@ export default function OrderReadyCard({
                     <b>{product.quantity}x</b>
                     <ul>
                       <li className="font-bold">{product.name}</li>
+                      <li className="text-sm">Tamaño: {product.size}</li>
+                      <li className="text-sm">Papas: {product.fries}</li>
                     </ul>
                     <small>${product.price.toLocaleString()}</small>
                   </li>
