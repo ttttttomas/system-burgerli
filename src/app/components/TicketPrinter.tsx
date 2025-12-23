@@ -41,7 +41,7 @@ export function buildReceipt(order: Orders) {
       {order.phone && <Text>Tel: {order.phone}</Text>}
       {order.email && <Text size={{ width: 1, height: 1 }}>Email: {order.email}</Text>}
       {order.address && <Text size={{ width: 1, height: 1 }}>Dirección: {order.address}</Text>}
-      {order.payment_method && <Text>Método de Pago: {order.payment_method === "Efectivo" ? "Efectivo" : "Mercado Pago"}</Text>}
+      {order.payment_method && <Text size={{ width: 1, height: 1 }}>Método de Pago: {order.payment_method === "Efectivo" ? "Efectivo" : "Mercado Pago"}</Text>}
       <Line />
       
       <Row left="ORDEN" right={`#${order.id_order?.slice(-6)}`} />
