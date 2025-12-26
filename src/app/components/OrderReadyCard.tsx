@@ -8,6 +8,11 @@ import { parseLineItems } from "@/lib/ProductsToJson";
 import TicketPrintButton from "./TicketPrinterButton";
 // import TicketPrintButton from "./TicketPrinterButton";
 
+// Helper function to get selected_options from either naming convention
+const getSelectedOptions = (product: any): string[] => {
+  return product.selected_options || product.selectedOptions || [];
+};
+
 interface OrderReadyCardProps {
   order: Orders;
   onMarkAsDelivered: (orderId: string) => void;
@@ -53,7 +58,7 @@ export default function OrderReadyCard({
         <small>#{order.id_order?.slice(0, 7)}</small>
         <div className="flex items-center justify-between">
           <b className="text-lg">{order.name}</b>
-          <p>Hace 5 minutos</p>
+          <p>Hace un momento</p>
         </div>
 
         <small>
@@ -121,9 +126,12 @@ export default function OrderReadyCard({
                     <b>{product.quantity}x</b>
                     <ul>
                       <li className="">{product.name}</li>
-                      {product.selected_options && product.selected_options.length > 0 && (
-                        <li className="text-sm">Opciones: {product.selected_options.join(", ")}</li>
-                      )}
+                      {(() => {
+                        const selectedOpts = getSelectedOptions(product);
+                        return selectedOpts.length > 0 && (
+                          <li className="text-sm">Opciones: {selectedOpts.join(", ")}</li>
+                        );
+                      })()}
                       {product.size && <li className="text-sm">Tamaño: {product.size}</li>}
                       {product.fries && <li className="text-sm">Papas: {product.fries}</li>}
                     </ul>

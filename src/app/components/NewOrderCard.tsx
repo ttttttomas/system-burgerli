@@ -16,6 +16,11 @@ interface NewOrderCardProps {
   onCancelOrder: (orderId: string) => void;
 }
 
+// Helper function to get selected_options from either naming convention
+const getSelectedOptions = (product: any): string[] => {
+  return product.selected_options || product.selectedOptions || [];
+};
+
 export default function NewOrderCard({
   order,
   timeAgo = "Hace un momento",
@@ -188,13 +193,15 @@ export default function NewOrderCard({
                             </span>
                             <div className="flex flex-col gap-1">
                               <p className="font-bold">{product.name}</p>
-                              {product.selected_options &&
-                                product.selected_options.length > 0 && (
+                              {(() => {
+                                const selectedOpts = getSelectedOptions(product);
+                                return selectedOpts.length > 0 && (
                                   <p className="font-bold">
                                     Opciones:{" "}
-                                    {product.selected_options.join(", ")}
+                                    {selectedOpts.join(", ")}
                                   </p>
-                                )}
+                                );
+                              })()}
                               {product.fries && (
                                 <div className="flex gap-2 items-center">
                                   <p className="font-normal">Papas:</p>

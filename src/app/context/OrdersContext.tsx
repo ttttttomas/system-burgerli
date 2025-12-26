@@ -100,8 +100,8 @@ export function OrdersContextProvider({ children }: { children: ReactNode }) {
     previousOrderCountRef.current = newOrders.length;
   }, [newOrders, isLoaded, audioEnabled]);
 
-  // Cargar órdenes desde localStorage al montar el componente
-  useEffect(() => {
+  // Función para cargar órdenes desde localStorage
+  const loadOrdersFromLocalStorage = () => {
     if (typeof window !== "undefined" && session?.local) {
       const localKey = session.local.toLowerCase();
 
@@ -110,6 +110,7 @@ export function OrdersContextProvider({ children }: { children: ReactNode }) {
         try {
           const parsed = JSON.parse(savedNewOrders);
           setNewOrders(parsed);
+          console.log("✅ Órdenes nuevas cargadas desde localStorage:", parsed.length);
         } catch (e) {
           console.error("❌ Error al parsear newOrders desde localStorage:", e);
         }
@@ -137,6 +138,25 @@ export function OrdersContextProvider({ children }: { children: ReactNode }) {
 
       setIsLoaded(true);
     }
+  };
+
+  // Cargar órdenes desde localStorage al montar el componente
+  useEffect(() => {
+    loadOrdersFromLocalStorage();
+  }, [session?.local]);
+
+  // Escuchar evento personalizado para recargar órdenes
+  useEffect(() => {
+    const handleOrdersUpdated = (event: CustomEvent) => {
+      console.log("🔄 Evento ordersUpdated recibido, recargando órdenes...");
+      loadOrdersFromLocalStorage();
+    };
+
+    window.addEventListener('ordersUpdated', handleOrdersUpdated as EventListener);
+
+    return () => {
+      window.removeEventListener('ordersUpdated', handleOrdersUpdated as EventListener);
+    };
   }, [session?.local]);
 
   // Guardar en localStorage cada vez que cambien los estados

@@ -16,7 +16,10 @@ export interface TicketItem {
   price: number;
 }
 
-
+// Helper function to get selected_options from either naming convention
+const getSelectedOptions = (product: any): string[] => {
+  return product.selected_options || product.selectedOptions || [];
+};
 
 export function buildReceipt(order: Orders) {
 
@@ -62,11 +65,14 @@ export function buildReceipt(order: Orders) {
             {/* Si tienes extras como 'fries' o 'size', puedes agregarlos aquí en pequeño */}
             {p.size && <Text size={{ width: 1, height: 1 }}> + Tamaño: {p.size}</Text>}
             {p.fries && <Text size={{ width: 1, height: 1 }}> + Papas: {p.fries}</Text>}
-            {p.selected_options && p.selected_options.length > 0 && (
-              <Text size={{ width: 1, height: 1 }}>
-                + Opciones: {p.selected_options.join(", ")}
-              </Text>
-            )}
+            {(() => {
+              const selectedOpts = getSelectedOptions(p);
+              return selectedOpts.length > 0 && (
+                <Text size={{ width: 1, height: 1 }}>
+                  + Opciones: {selectedOpts.join(", ")}
+                </Text>
+              );
+            })()}
           </React.Fragment>
         );
       })}

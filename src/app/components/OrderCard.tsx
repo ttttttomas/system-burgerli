@@ -11,6 +11,11 @@ import TicketPrintButton from "./TicketPrinterButton";
 
 const inter = Inter({ subsets: ["latin"], weight: "400" });
 
+// Helper function to get selected_options from either naming convention
+const getSelectedOptions = (product: any): string[] => {
+  return product.selected_options || product.selectedOptions || [];
+};
+
 // Hook para bloquear el scroll del <body>
 function useLockBodyScroll(lock: boolean) {
   useEffect(() => {
@@ -126,7 +131,10 @@ export default function OrderCard({
                   <ul className="flex flex-col gap-1">
                     <li className="font-bold">{product.name}</li>
                     {product.size && <li>Tamaño: {product.size}</li>}
-                    {product.selected_options && product.selected_options.length > 0 && ( <li>Opciones: {product.selected_options.join(", ")}</li> )}
+                    {(() => {
+                      const selectedOpts = getSelectedOptions(product);
+                      return selectedOpts.length > 0 && <li>Opciones: {selectedOpts.join(", ")}</li>;
+                    })()}
                   </ul>
                 </div>
               ))
@@ -220,12 +228,15 @@ export default function OrderCard({
                       <ul>
                         <li className="font-bold">{product.name}</li>
                         {product.size && <li>Tamaño: {product.size}</li>}
-                        {product.selected_options && (
-                          <div className="flex gap-2 items-center">
-                            <small className="font-semibold">Opciones:</small>
-                            <small>{product.selected_options.join(", ")}</small>
-                          </div>
-                        )}
+                        {(() => {
+                          const selectedOpts = getSelectedOptions(product);
+                          return selectedOpts.length > 0 && (
+                            <div className="flex gap-2 items-center">
+                              <small className="font-semibold">Opciones:</small>
+                              <small>{selectedOpts.join(", ")}</small>
+                            </div>
+                          );
+                        })()}
                         {Array.isArray(product.sin) &&
                           product.sin.length > 0 && (
                             <div className="flex gap-2 items-center">

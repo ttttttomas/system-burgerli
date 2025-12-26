@@ -73,7 +73,7 @@ export default function LocalsPage() {
   if (loading) {
     return (
       <main className="min-h-screen md:pt-20 lg:pt-10 px-4 lg:ml-72 lg:mr-10">
-        <h1 className="text-center text-2xl lg:text-3xl font-bold mb-8 text-white">
+        <h1 className="text-center text-2xl lg:text-3xl font-bold mb-8 text-black">
           Gestión de Locales
         </h1>
         <div className="flex justify-center items-center h-64">
@@ -85,7 +85,7 @@ export default function LocalsPage() {
 
   return (
     <main className="min-h-screen md:pt-20 lg:pt-10 px-4 lg:ml-72 lg:mr-10">
-      <h1 className="text-center text-2xl lg:text-3xl font-bold mb-8 text-white">
+      <h1 className="text-center text-2xl lg:text-3xl font-bold mb-8 text-black">
         Gestión de Locales
       </h1>
       

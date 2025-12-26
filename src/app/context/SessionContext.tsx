@@ -131,6 +131,30 @@ export function SessionContextProvider({children}: {children: React.ReactNode}) 
     initializeAuth();
   }, []);
 
+  // Cargar órdenes confirmadas cuando la sesión esté lista
+  useEffect(() => {
+    const loadConfirmedOrders = async () => {
+      if (session?.local) {
+        try {
+          const orders = await getOrdersWithConfirmed(session.local);
+          if (orders && orders.length > 0) {
+            console.log("📦 Órdenes confirmadas cargadas:", orders);
+            localStorage.setItem(`newOrders_${session.local}`, JSON.stringify(orders));
+            
+            // Disparar un evento personalizado para notificar al OrdersContext
+            window.dispatchEvent(new CustomEvent('ordersUpdated', { 
+              detail: { local: session.local } 
+            }));
+          }
+        } catch (error) {
+          console.error("❌ Error cargando órdenes confirmadas:", error);
+        }
+      }
+    };
+
+    loadConfirmedOrders();
+  }, [session?.local]);
+
 
 
   return (
