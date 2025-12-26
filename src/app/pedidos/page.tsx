@@ -4,9 +4,10 @@ import OrderReadyCard from "../components/OrderReadyCard";
 import PopupOrders from "../components/PopupOrders";
 import { useSession } from "../context/SessionContext";
 import { useOrders } from "../context/OrdersContext";
-
+import useAuth from "../hooks/useAuth";
+import { useEffect, useState } from "react";
 export default function HomePage() {
-  const { session } = useSession();
+  const { session, OrdersToAddLocalStorage } = useSession();
   const {
     newOrders,
     ordersInPreparation,
@@ -19,6 +20,9 @@ export default function HomePage() {
     enableAudioNotifications,
   } = useOrders();
 
+  OrdersToAddLocalStorage();
+
+  
   return (
     <main className="ml-77 h-full font-bold text-black">
       {/* Banner para habilitar notificaciones de audio */}

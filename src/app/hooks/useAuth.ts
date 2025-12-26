@@ -99,5 +99,33 @@ export default function useAuth() {
     catch (error) {console.error(error)}
   }
 
-  return {login, verifyCookie, logout, getCurrentUser, deleteOrder};
+  const getOrdersWithConfirmed = async (local: any) => {
+    try {
+      const response = await axios.get(`https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/getOrdersByLocalStatusConfirmed/${local}`, {    
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      return response.data;
+    } catch (error) {
+      console.error(error);
+    }
+    }
+
+  const getLocals = async () => {
+    try {
+      const response = await axios.get(`https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/getLocals`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      return response.data;
+    } catch (error) {
+      console.error(error);
+    }
+    }
+
+    return {login, verifyCookie, logout, getCurrentUser, deleteOrder, getOrdersWithConfirmed, getLocals};
 }

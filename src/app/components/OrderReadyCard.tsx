@@ -46,7 +46,7 @@ export default function OrderReadyCard({
   const productCount = order.products?.length || 0;
 
   const obj = parseLineItems(order.products);
-
+  
   return (
     <>
       <section className="flex w-90 flex-col gap-3 rounded-xl bg-[#493D2E] px-5 pt-3 text-white shadow-lg shadow-black/50">
@@ -121,8 +121,8 @@ export default function OrderReadyCard({
                     <b>{product.quantity}x</b>
                     <ul>
                       <li className="">{product.name}</li>
-                      {product.selectedOptions && product.selectedOptions.length > 0 && (
-                        <li className="text-sm">Opciones: {product.selectedOptions.join(", ")}</li>
+                      {product.selected_options && product.selected_options.length > 0 && (
+                        <li className="text-sm">Opciones: {product.selected_options.join(", ")}</li>
                       )}
                       {product.size && <li className="text-sm">Tamaño: {product.size}</li>}
                       {product.fries && <li className="text-sm">Papas: {product.fries}</li>}

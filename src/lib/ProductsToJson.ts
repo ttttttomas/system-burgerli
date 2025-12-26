@@ -1,5 +1,6 @@
 export interface Product {
-  selectedOptions: string[];
+  selected_options: string[];
+  selectedOptions?: string[];
   quantity: number;
   name: string;
   price: number;

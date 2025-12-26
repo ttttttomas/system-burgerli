@@ -28,7 +28,6 @@ export default function NewOrderCard({
 
   const openModal = (order: Orders) => {
     setSelectedOrder(order);
-    console.log(order);
   };
 
   const closeModal = () => {
@@ -50,7 +49,6 @@ export default function NewOrderCard({
   };
 
   const obj = parseLineItems(order.products);
-  console.log(obj);
 
   return (
     <>
@@ -190,11 +188,11 @@ export default function NewOrderCard({
                             </span>
                             <div className="flex flex-col gap-1">
                               <p className="font-bold">{product.name}</p>
-                              {product.selectedOptions &&
-                                product.selectedOptions.length > 0 && (
+                              {product.selected_options &&
+                                product.selected_options.length > 0 && (
                                   <p className="font-bold">
                                     Opciones:{" "}
-                                    {product.selectedOptions.join(", ")}
+                                    {product.selected_options.join(", ")}
                                   </p>
                                 )}
                               {product.fries && (

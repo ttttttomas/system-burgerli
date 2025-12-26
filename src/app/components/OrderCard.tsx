@@ -93,7 +93,8 @@ export default function OrderCard({
   };
 
   const obj = parseLineItems(order.products);
-
+  console.log(obj);
+  
   return (
     <section className={`${inter.className} relative`}>
       {/* GRID / CARD */}
@@ -125,7 +126,7 @@ export default function OrderCard({
                   <ul className="flex flex-col gap-1">
                     <li className="font-bold">{product.name}</li>
                     {product.size && <li>Tamaño: {product.size}</li>}
-                    {product.selectedOptions && product.selectedOptions.length > 0 && ( <li>Opciones: {product.selectedOptions.join(", ")}</li> )}
+                    {product.selected_options && product.selected_options.length > 0 && ( <li>Opciones: {product.selected_options.join(", ")}</li> )}
                   </ul>
                 </div>
               ))
@@ -219,10 +220,10 @@ export default function OrderCard({
                       <ul>
                         <li className="font-bold">{product.name}</li>
                         {product.size && <li>Tamaño: {product.size}</li>}
-                        {product.selectedOptions && product.selectedOptions.length > 0 && (
+                        {product.selected_options && (
                           <div className="flex gap-2 items-center">
                             <small className="font-semibold">Opciones:</small>
-                            <small>{product.selectedOptions.join(", ")}</small>
+                            <small>{product.selected_options.join(", ")}</small>
                           </div>
                         )}
                         {Array.isArray(product.sin) &&

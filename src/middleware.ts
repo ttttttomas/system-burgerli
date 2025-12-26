@@ -1,7 +1,7 @@
 // middleware.ts
 import { NextRequest, NextResponse, NextMiddleware } from "next/server";
 
-const protectedRoutes = ["/orders", "/pedidos", "/admin"];
+const protectedRoutes = ["/orders", "/pedidos", "/admin", "/change-local-status", "/orders-history", "/menu"];
 
 function isProtectedPath(pathname: string) {
   return protectedRoutes.some((p) => pathname.startsWith(p));

@@ -16,8 +16,6 @@ export default function OrderPages() {
   const [selectedOrder, setSelectedOrder] = useState<Orders | null>(null);
   const { newOrders, moveToPreparation, cancelOrder } = useOrders();
 
-  
-
   const openModal = (order: Orders) => {
     setSelectedOrder(order);
 
@@ -48,8 +46,11 @@ export default function OrderPages() {
     return <div className="mr-8 ml-80 flex flex-col justify-start gap-5 text-black">Loading...</div>;
   }
   
-  const obj = orders.length > 0 ? parseLineItems(orders[0].products) : [];
+  // const obj = orders.length > 0 ? parseLineItems(orders[0].products) : [];
+
+  const obj = selectedOrder ? parseLineItems(selectedOrder.products) : null;
   console.log(obj);
+  
   
   return (
     <main className="mr-8 ml-80 flex flex-col justify-start gap-5 text-black">
@@ -155,17 +156,24 @@ export default function OrderPages() {
                   <p>{selectedOrder.delivery_mode === "pickup" ? 'Retiro en local' : 'Delivery'}</p>
                   <h3 className="text-center font-bold underline my-2">Pedido</h3>
                   <ul className="flex flex-col gap-5">
-                    {selectedOrder.products && selectedOrder.products.length > 0 ? (
-                      obj.map((product, index) => (
-                        <li key={index} className="flex justify-between gap-5">
-                          <b>{product.quantity}x</b>
-                          <ul>
-                            <li className="font-bold">{product.name}</li>
-                            <li className="text-sm">Tamaño: {product.size}</li>
-                            <li className="text-sm">Papas: {product.fries}</li>
+                    {selectedOrder.products ? (
+                      obj?.map((product, index) => (
+                        <div className="flex justify-between">
+                        <li key={index} className="flex justify-between items-start gap-5">
+                          <ul className="flex  gap-1">
+                            <b>{product.quantity}x</b>
+                            <div className="flex flex-col">
+                            <li className="font-bold text-wrap max-w-50">{product.name}</li>
+                            {product.size && <li className="text-sm">Tamaño: {product.size}</li>}
+                            {product.fries && <li className="text-sm">Papas: {product.fries}</li>}
+                            {product.selectedOptions && ( 
+                              <li className="text-sm">Opciones: {product.selectedOptions.join(", ")}</li>
+                            )}
+                            </div>
                           </ul>
-                          <small>${product.price.toLocaleString()}</small>
                         </li>
+                          <small>${product.price.toLocaleString()}</small>
+                        </div>
                       ))
                     ) : (
                       <li>No hay productos</li>
