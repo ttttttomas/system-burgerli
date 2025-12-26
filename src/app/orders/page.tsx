@@ -8,6 +8,9 @@ import TicketPrintButton from "../components/TicketPrinterButton";
 import PopupOrders from "../components/PopupOrders";
 import { useOrders } from "../context/OrdersContext";
 
+const getSelectedOptions = (product: any): string[] => {
+  return product.selected_options || product.selectedOptions || [];
+};
 
 export default function OrderPages() {
   const [loading, setLoading] = useState(true);
@@ -166,9 +169,15 @@ export default function OrderPages() {
                             <li className="font-bold text-wrap max-w-50">{product.name}</li>
                             {product.size && <li className="text-sm">Tamaño: {product.size}</li>}
                             {product.fries && <li className="text-sm">Papas: {product.fries}</li>}
-                            {product.selectedOptions && ( 
-                              <li className="text-sm">Opciones: {product.selectedOptions.join(", ")}</li>
-                            )}
+                            {(() => {
+                                const selectedOpts = getSelectedOptions(product);
+                                return selectedOpts.length > 0 && (
+                                  <p className="font-bold">
+                                    Opciones:{" "}
+                                    {selectedOpts.join(", ")}
+                                  </p>
+                                );
+                              })()}
                             </div>
                           </ul>
                         </li>

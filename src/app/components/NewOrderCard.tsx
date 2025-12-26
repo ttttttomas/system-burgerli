@@ -40,6 +40,7 @@ export default function NewOrderCard({
   };
 
   const handleMoveToPreparation = () => {
+    closeModal();
     if (order.id_order) {
       onMoveToPreparation(order.id_order);
       closeModal();
