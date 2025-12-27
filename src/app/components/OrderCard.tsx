@@ -112,8 +112,8 @@ export default function OrderCard({
         <div className="container flex w-80 flex-col rounded-xl bg-[#FCEDCC] shadow-lg shadow-black/50">
           <div className="flex flex-col items-center rounded-t-xl bg-[#FD4E4E] px-5 py-1">
             <div className="flex w-full items-center justify-between">
-              <small className="font-semibold">
-                #{order.id_order?.slice(0, 5)}
+              <small className="font-semibold text-white">
+                #{order.dailySequenceNumber?.toString().padStart(3, '0') || '---'}
               </small>
               <small className="font-semibold">
                 {new Date().toLocaleTimeString()}

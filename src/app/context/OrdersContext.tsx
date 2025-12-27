@@ -181,16 +181,42 @@ export function OrdersContextProvider({ children }: { children: ReactNode }) {
     }
   }, [ordersReady, isLoaded, session?.local]);
 
+  // Función para obtener el siguiente número secuencial diario
+  const getNextSequenceNumber = (): number => {
+    if (typeof window === "undefined" || !session?.local) return 1;
+
+    const localKey = session.local.toLowerCase();
+    const today = new Date().toISOString().split('T')[0]; // Formato: YYYY-MM-DD
+    
+    const savedDate = localStorage.getItem(`sequenceDate_${localKey}`);
+    const savedCounter = localStorage.getItem(`sequenceCounter_${localKey}`);
+
+    // Si es un nuevo día, reiniciar el contador
+    if (savedDate !== today) {
+      localStorage.setItem(`sequenceDate_${localKey}`, today);
+      localStorage.setItem(`sequenceCounter_${localKey}`, '1');
+      return 1;
+    }
+
+    // Si es el mismo día, incrementar el contador
+    const currentCounter = savedCounter ? parseInt(savedCounter, 10) : 0;
+    const nextNumber = currentCounter + 1;
+    localStorage.setItem(`sequenceCounter_${localKey}`, nextNumber.toString());
+    
+    return nextNumber;
+  };
+
   // Función para mover una orden a "En preparación"
   const moveToPreparation = (orderId: string) => {
     const orderToMove = newOrders.find((order) => order.id_order === orderId);
 
     if (orderToMove) {
       const newStatus = "in_preparation";
+      const sequenceNumber = getNextSequenceNumber();
 
       setOrdersInPreparation((prev) => [
         ...prev,
-        { ...orderToMove, status: newStatus },
+        { ...orderToMove, status: newStatus, dailySequenceNumber: sequenceNumber },
       ]);
 
       setNewOrders((prev) =>

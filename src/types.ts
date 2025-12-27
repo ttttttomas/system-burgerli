@@ -15,6 +15,7 @@ export type Orders = {
   fries?: string | null;
   drinks?: string | null;
   products: string[];
+  dailySequenceNumber?: number; // Número secuencial diario para pedidos en preparación
 };
 
 export type SessionUser = {

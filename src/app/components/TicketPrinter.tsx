@@ -49,7 +49,7 @@ export function buildReceipt(order: Orders) {
       {order.payment_method && <Text size={{ width: 1, height: 1 }}>Método de Pago: {order.payment_method === "Efectivo" ? "Efectivo" : "Mercado Pago"}</Text>}
       <Line />
       
-      <Row left="ORDEN" right={`#${order.id_order?.slice(-6)}`} />
+      <Row left="ORDEN" right={`#${order.dailySequenceNumber?.toString().padStart(3, '0') || '---'}`} />
       <Row left="FECHA" right={new Date().toLocaleDateString()} />
       <Line />
       <Br />
@@ -82,16 +82,20 @@ export function buildReceipt(order: Orders) {
       <Br />
       <Line />
       {/* Sección de desglose de precios */}
-      <Row left="Subtotal" right={`$${subtotal.toFixed(2)}`} />
-      {order.payment_method === "Efectivo" ? null : <Row left="Servicio (8%) " right={`$${comision.toFixed(2)}`} />}
       
+      {order.payment_method === "Efectivo" 
+      ? 
+      <Row left="Total" right={`$${total.toFixed(2)}`} /> 
+      : 
+      <React.Fragment>
+        <Row left="Subtotal" right={`$${subtotal.toFixed(2)}`} />
+        <Row left="Servicio (8%) " right={`$${comision.toFixed(2)}`} />
+      </React.Fragment>
+      }
       <Line />
-      {order.payment_method === "Efectivo" ? <Row 
-        left={<Text bold>TOTAL</Text>} 
-        right={<Text bold>{`$${subtotal}`}</Text>} 
-      /> : <Row 
+      {order.payment_method !== "Efectivo" && <Row 
       left={<Text bold>TOTAL</Text>} 
-      right={<Text bold>{`$${total}`}</Text>} 
+      right={<Text bold>{`$${total.toFixed(2)}`}</Text>} 
     />}
       <Line />
       
