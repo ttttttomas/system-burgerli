@@ -99,7 +99,23 @@ export default function OrderCard({
 
   const obj = parseLineItems(order.products);
   console.log(obj);
-  
+  const date = order?.created_at;
+  const formatted = date?.replace(" ", "T") + "Z";
+
+
+console.log(formatted);
+ const date2 = new Date(formatted);
+ console.log(date2);
+const dayAR = date2.toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" });
+const timeAR = date2.toLocaleTimeString("es-AR", {
+  timeZone: "America/Argentina/Buenos_Aires",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+});
+
+console.log(dayAR, timeAR);
+
   return (
     <section className={`${inter.className} relative`}>
       {/* GRID / CARD */}
@@ -190,8 +206,8 @@ export default function OrderCard({
                 (#{selectedOrder.id_order?.slice(0, 10)})
               </p>
               <div className="flex items-center justify-between text-sm">
-                <p>{new Date().toLocaleDateString()}</p>
-                <p>{new Date().toLocaleTimeString()}</p>
+                <p>{dayAR}</p>
+                <p>{timeAR}</p>
               </div>
 
               <h2 className="text-center font-bold underline">

@@ -51,6 +51,22 @@ export default function OrderReadyCard({
   const productCount = order.products?.length || 0;
 
   const obj = parseLineItems(order.products);
+    const date = order?.created_at;
+  const formatted = date?.replace(" ", "T") + "Z";
+
+
+console.log(formatted);
+ const date2 = new Date(formatted);
+ console.log(date2);
+const dayAR = date2.toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" });
+const timeAR = date2.toLocaleTimeString("es-AR", {
+  timeZone: "America/Argentina/Buenos_Aires",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+});
+
+console.log(dayAR, timeAR);
   
   return (
     <>
@@ -92,8 +108,8 @@ export default function OrderReadyCard({
               (#{selectedOrder.id_order?.slice(0, 10)})
             </p>
             <div className="flex items-center justify-between text-sm">
-              <p>{new Date().toLocaleDateString()}</p>
-              <p>{new Date().toLocaleTimeString()}</p>
+              <p>{dayAR}</p>
+              <p>{timeAR}</p>
             </div>
             <h2 className="text-center font-bold underline">
               Datos del cliente

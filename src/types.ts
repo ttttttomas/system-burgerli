@@ -1,6 +1,6 @@
 export type Orders = {
   id_order?: string;
-  // created_at: string; // VIENEN CREADOS DESDE LA BASE DE DATOS
+  created_at?: string; // VIENEN CREADOS DESDE LA BASE DE DATOS
   payment_method: string;
   delivery_mode: string;
   price: number;
