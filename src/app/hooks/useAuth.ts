@@ -127,5 +127,18 @@ export default function useAuth() {
     }
     }
 
-    return {login, verifyCookie, logout, getCurrentUser, deleteOrder, getOrdersWithConfirmed, getLocals};
+    const getOrders = async () => {
+      try {
+        const response = await axios.get(`https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/getOrders`, {    
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        });
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+      }
+    return {login, verifyCookie, logout, getOrders, getCurrentUser, deleteOrder, getOrdersWithConfirmed, getLocals};
 }

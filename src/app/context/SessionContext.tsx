@@ -11,6 +11,7 @@ type Ctx = {
   session: SessionUser | null;
   loading: boolean;
   locals: () => Promise<any>;
+  orders: () => Promise<any>;
   OrdersToAddLocalStorage: () => Promise<void>;
   logoutUser: () => Promise<void>;
   loginUser: (username: string, password: string) => Promise<LoginResult>;
@@ -27,7 +28,7 @@ export function useSession() {
 }
 
 export function SessionContextProvider({children}: {children: React.ReactNode}) {
-  const {login,getLocals , verifyCookie, getOrdersWithConfirmed ,logout} = useAuth();
+  const {login,getLocals , verifyCookie, getOrders, getOrdersWithConfirmed ,logout} = useAuth();
   const [session, setSession] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState<boolean>(true); // Iniciar en true para mostrar loading inicial
 
@@ -120,6 +121,11 @@ export function SessionContextProvider({children}: {children: React.ReactNode}) 
     return locals.locals;
   }
 
+  const orders = async () => {
+    const orders = await getOrders();
+    return orders;
+  }
+
   // Verificar autenticación al montar el componente
   useEffect(() => {
     const initializeAuth = async () => {
@@ -158,7 +164,7 @@ export function SessionContextProvider({children}: {children: React.ReactNode}) 
 
 
   return (
-    <SessionContext.Provider value={{session,locals , OrdersToAddLocalStorage, logoutUser, loginUser, loading}}>
+    <SessionContext.Provider value={{session,locals , orders, OrdersToAddLocalStorage, logoutUser, loginUser, loading}}>
       {children}
     </SessionContext.Provider>
   );

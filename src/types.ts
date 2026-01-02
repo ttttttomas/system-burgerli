@@ -14,8 +14,21 @@ export type Orders = {
   coupon?: string | null;
   fries?: string | null;
   drinks?: string | null;
-  products: string[];
+  products: string[] // Puede venir como array de strings, array de objetos, o string JSON
   dailySequenceNumber?: number; // Número secuencial diario para pedidos en preparación
+};
+
+export type ProductsOrder = {
+  name?: string;
+  nombre?: string;
+  product_name?: string;
+  quantity?: number;
+  sin?: string[];
+  fries?: string;
+  price?: number;
+  size?: string;
+  selectedOptions?: string[];
+  selected_options?: string[];
 };
 
 export type SessionUser = {
