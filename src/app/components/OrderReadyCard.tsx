@@ -51,23 +51,25 @@ export default function OrderReadyCard({
   const productCount = order.products?.length || 0;
 
   const obj = parseLineItems(order.products);
-    const date = order?.created_at;
+  const date = order?.created_at;
   const formatted = date?.replace(" ", "T") + "Z";
 
+  const safe = formatted
+    .replace("Z", "") // sacás el Z duplicado
+    .replace("+00:00", "Z") // dejás solo el Z
+    .replace(/(\.\d{3})\d+Z$/, "$1Z"); // recortás a 3 decimales
+  const date2 = new Date(safe);
+  console.log(date2);
+  const dayAR = date2.toLocaleDateString("es-AR", {
+    timeZone: "America/Argentina/Buenos_Aires",
+  });
+  const timeAR = date2.toLocaleTimeString("es-AR", {
+    timeZone: "America/Argentina/Buenos_Aires",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 
-console.log(formatted);
- const date2 = new Date(formatted);
- console.log(date2);
-const dayAR = date2.toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" });
-const timeAR = date2.toLocaleTimeString("es-AR", {
-  timeZone: "America/Argentina/Buenos_Aires",
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-});
-
-console.log(dayAR, timeAR);
-  
   return (
     <>
       <section className="flex w-90 flex-col gap-3 rounded-xl bg-[#493D2E] px-5 pt-3 text-white shadow-lg shadow-black/50">
@@ -133,7 +135,11 @@ console.log(dayAR, timeAR);
             <h2 className="text-center font-bold underline">
               Forma de entrega
             </h2>
-            <p>{selectedOrder.delivery_mode === "pickup" ? 'Retiro en local' : 'Delivery'}</p>
+            <p>
+              {selectedOrder.delivery_mode === "pickup"
+                ? "Retiro en local"
+                : "Delivery"}
+            </p>
             <h3 className="text-center font-bold underline">Pedido</h3>
             <ul className="flex flex-col gap-1">
               {selectedOrder.products && selectedOrder.products.length > 0 ? (
@@ -144,12 +150,20 @@ console.log(dayAR, timeAR);
                       <li className="">{product.name}</li>
                       {(() => {
                         const selectedOpts = getSelectedOptions(product);
-                        return selectedOpts.length > 0 && (
-                          <li className="text-sm">Opciones: {selectedOpts.join(", ")}</li>
+                        return (
+                          selectedOpts.length > 0 && (
+                            <li className="text-sm">
+                              Opciones: {selectedOpts.join(", ")}
+                            </li>
+                          )
                         );
                       })()}
-                      {product.size && <li className="text-sm">Tamaño: {product.size}</li>}
-                      {product.fries && <li className="text-sm">Papas: {product.fries}</li>}
+                      {product.size && (
+                        <li className="text-sm">Tamaño: {product.size}</li>
+                      )}
+                      {product.fries && (
+                        <li className="text-sm">Papas: {product.fries}</li>
+                      )}
                     </ul>
                     <small>${product.price.toLocaleString()}</small>
                   </li>
@@ -164,9 +178,9 @@ console.log(dayAR, timeAR);
             </div>
             <b>
               Pago:
-               {selectedOrder.payment_method === "Efectivo"
-                      ? " Efectivo"
-                      : " Mercado Pago"}
+              {selectedOrder.payment_method === "Efectivo"
+                ? " Efectivo"
+                : " Mercado Pago"}
             </b>
             {selectedOrder.order_notes && (
               <>

@@ -32,6 +32,8 @@ export default function NewOrderCard({
   const productCount = order.products?.length || 0;
 
   const openModal = (order: Orders) => {
+    console.log(order);
+    
     setSelectedOrder(order);
   };
 

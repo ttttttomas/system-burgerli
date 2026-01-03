@@ -103,8 +103,11 @@ export default function OrderCard({
   const formatted = date?.replace(" ", "T") + "Z";
 
 
-console.log(formatted);
- const date2 = new Date(formatted);
+const safe = formatted
+  .replace("Z", "")              // sacás el Z duplicado
+  .replace("+00:00", "Z")        // dejás solo el Z
+  .replace(/(\.\d{3})\d+Z$/, "$1Z"); // recortás a 3 decimales
+ const date2 = new Date(safe);
  console.log(date2);
 const dayAR = date2.toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" });
 const timeAR = date2.toLocaleTimeString("es-AR", {
@@ -114,7 +117,6 @@ const timeAR = date2.toLocaleTimeString("es-AR", {
   second: "2-digit",
 });
 
-console.log(dayAR, timeAR);
 
   return (
     <section className={`${inter.className} relative`}>
