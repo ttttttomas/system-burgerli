@@ -8,13 +8,8 @@ type User = {
 export default function useAuth() {
   const login = async ({username, password}: User) => {
     const res = await axios.post(
-<<<<<<< HEAD
       // "http://localhost:8000/token",
       `https://burgerli.ar/MdpuF8KsXiRArNlHtl6pXO2XyLSJMTQ8_Burgerli/api/token`,
-=======
-     //  "http://localhost:8000/token",
-    `https://burgerli.ar/MdpuF8KsXiRArNlHtl6pXO2XyLSJMTQ8_Burgerli/api/token`,
->>>>>>> fc40f4974c8c8d5b294e86f87d5f37bcf3ca8832
       {username, password},
       {
         withCredentials: true,
