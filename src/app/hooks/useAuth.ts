@@ -8,8 +8,8 @@ type User = {
 export default function useAuth() {
   const login = async ({username, password}: User) => {
     const res = await axios.post(
-      "http://localhost:8000/token",
-      // `https://burgerli.ar/MdpuF8KsXiRArNlHtl6pXO2XyLSJMTQ8_Burgerli/api/token`,
+     //  "http://localhost:8000/token",
+    `https://burgerli.ar/MdpuF8KsXiRArNlHtl6pXO2XyLSJMTQ8_Burgerli/api/token`,
       {username, password},
       {
         withCredentials: true,
@@ -32,8 +32,8 @@ export default function useAuth() {
   const verifyCookie = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/verify-cookie"
-        // `https://burgerli.ar/MdpuF8KsXiRArNlHtl6pXO2XyLSJMTQ8_Burgerli/api/verify-cookie`
+        // "http://localhost:8000/verify-cookie"
+        `https://burgerli.ar/MdpuF8KsXiRArNlHtl6pXO2XyLSJMTQ8_Burgerli/api/verify-cookie`
         , {
         headers: {
           "Content-Type": "application/json",
