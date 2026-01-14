@@ -503,7 +503,7 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <main className="ml-72 mr-10 flex h-screen items-center justify-center">
+      <main className="flex h-screen items-center justify-center px-4 md:px-6 lg:ml-72 lg:px-10">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-[#b36921]" />
           <p className="mt-4 text-[#4b2f1e]">Cargando analíticas...</p>
@@ -513,15 +513,15 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="ml-72 mx-10 min-h-screen pb-10 text-black">
+    <main className="min-h-screen pb-10 text-black px-4 md:px-6 lg:ml-72 lg:px-10">
       {/* Header */}
-      <section className="flex items-center justify-between pt-6 pb-8">
-        <h1 className="text-3xl  mx-10 font-semibold">Analítica - General</h1>
-        <div className="mx-10">
+      <section className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 pb-8">
+        <h1 className="text-2xl md:text-3xl font-semibold">Analítica - General</h1>
+        <div className="w-full sm:w-auto">
           <select
             value={selectedLocal}
             onChange={(e) => setSelectedLocal(e.target.value)}
-            className="rounded-lg bg-[#EEAA4B] px-4 py-2 text-xl font-medium hover:bg-[#d99a3b] transition-colors cursor-pointer outline-none border-none"
+            className="w-full rounded-lg bg-[#EEAA4B] px-4 py-2 text-lg md:text-xl font-medium hover:bg-[#d99a3b] transition-colors cursor-pointer outline-none border-none"
           >
             <option value="all" >Vista general</option>
             {availableLocals.map((local, index) => (
@@ -534,7 +534,7 @@ export default function AdminPage() {
       </section>
 
       {/* Sección principal: Filtros + Métricas + Gráfico */}
-      <section className="mb-10 grid place-content-center mx-10 grid-cols-1 lg:grid-cols-3 gap-6">
+      <section className="mb-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Columna izquierda: Filtros y Métricas */}
         <div className="lg:col-span-1 space-y-6">
           {/* Filtros */}
@@ -641,11 +641,11 @@ export default function AdminPage() {
         </div>
 
         {/* Columna derecha: Gráfico */}
-        <div className="lg:col-span-2 rounded-xl bg-[#4b2f1e] p-6 shadow-md">
-          <p className="text-white text-2xl font-semibold mb-4">
+        <div className="lg:col-span-2 rounded-xl bg-[#4b2f1e] p-4 md:p-6 shadow-md">
+          <p className="text-white text-xl md:text-2xl font-semibold mb-4">
             Ingresos totales
           </p>
-          <ResponsiveContainer width="100%" height={600}>
+          <ResponsiveContainer width="100%" height={400} className="md:h-[500px] lg:h-[600px]">
             <AreaChart
               data={chartData}
               margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
@@ -700,7 +700,7 @@ export default function AdminPage() {
       </section>
 
       {/* Tabla de Ventas de Productos */}
-      <section className="mt-10  mx-10">
+      <section className="mt-10">
         <h2 className="text-2xl font-bold mb-5">Venta de productos</h2>
         <div className="overflow-x-auto rounded-xl shadow-md">
           <table className="w-full table-auto border-collapse">

@@ -125,7 +125,7 @@ export default function OrderHistoryPage() {
 
   if (loading) {
     return (
-      <main className="mr-10 ml-80 flex h-screen items-center justify-center">
+      <main className="flex h-screen items-center justify-center px-4 md:px-6 lg:ml-72 lg:px-10">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-[#b36921]" />
           <p className="mt-4 text-[#4b2f1e]">Cargando historial...</p>
@@ -137,14 +137,14 @@ export default function OrderHistoryPage() {
   const obj = selectedOrder ? parseLineItems(selectedOrder.products as string[]) : null;
 
   return (
-    <main className="mr-10 ml-80 flex flex-col justify-start gap-5 text-black pb-10">
+    <main className="flex flex-col justify-start gap-5 text-black pb-10 px-4 md:px-6 lg:ml-72 lg:px-10">
       {/* Header */}
-      <section className="flex items-center justify-between pt-6">
-        <h1 className="text-3xl font-semibold">
+      <section className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6">
+        <h1 className="text-2xl md:text-3xl font-semibold">
           Historial de pedidos{session?.rol === "employed" ? ` - ${session?.local}` : ""}
         </h1>
         <button
-          className="rounded-xl bg-[#EEAA4B] px-5 py-2 text-lg font-medium hover:bg-[#d99a3b] transition-colors"
+          className="w-full sm:w-auto md:block hidden rounded-xl bg-[#EEAA4B] px-5 py-2 text-lg font-medium hover:bg-[#d99a3b] transition-colors"
           type="button"
         >
           Vista general
@@ -152,8 +152,8 @@ export default function OrderHistoryPage() {
       </section>
 
       {/* Filtros de búsqueda */}
-      <section className="flex items-center justify-start gap-5 flex-wrap">
-        <div className="flex w-64 items-center gap-2 rounded-xl bg-[#EEAA4B] px-4 py-2">
+      <section className="flex items-center justify-start gap-3 md:gap-5 flex-wrap">
+        <div className="flex w-full sm:w-64 items-center gap-2 rounded-xl bg-[#EEAA4B] px-4 py-2">
           <Lupa />
           <input
             className="flex-1 bg-transparent font-medium placeholder:text-black/70 focus:outline-none"
@@ -163,7 +163,7 @@ export default function OrderHistoryPage() {
             onChange={(e) => setSearchClient(e.target.value)}
           />
         </div>
-        <div className="flex w-64 items-center gap-2 rounded-xl bg-[#EEAA4B] px-4 py-2">
+        <div className="flex w-full sm:w-64 items-center gap-2 rounded-xl bg-[#EEAA4B] px-4 py-2">
           <input
             className="flex-1 bg-transparent font-medium focus:outline-none cursor-pointer"
             type="date"
@@ -171,7 +171,7 @@ export default function OrderHistoryPage() {
             onChange={(e) => setSearchDate(e.target.value)}
           />
         </div>
-        <div className="flex w-64 items-center gap-2 rounded-xl bg-[#EEAA4B] px-4 py-2">
+        <div className="flex w-full sm:w-64 items-center gap-2 rounded-xl bg-[#EEAA4B] px-4 py-2">
           <select
             className="flex-1 bg-transparent font-medium focus:outline-none cursor-pointer"
             value={searchPaymentMethod}
@@ -182,10 +182,9 @@ export default function OrderHistoryPage() {
             <option value="mercadopago">Mercado Pago</option>
           </select>
         </div>
-        
         {/* Filtro por local - Solo para admin */}
         {session?.rol === "admin" && locales.length > 0 && (
-          <div className="flex w-64 items-center gap-2 rounded-xl bg-[#EEAA4B] px-4 py-2">
+          <div className="flex w-full sm:w-64 items-center gap-2 rounded-xl bg-[#EEAA4B] px-4 py-2">
             <select
               className="flex-1 bg-transparent font-medium focus:outline-none cursor-pointer"
               value={selectedLocal}
@@ -281,7 +280,7 @@ export default function OrderHistoryPage() {
 
       {/* Modal de detalles */}
       {selectedOrder && (
-        <aside className="fixed top-0 right-0 z-40 flex h-full w-96 flex-col gap-5 bg-[#FCEDCC] text-black shadow-xl shadow-black/40 transition-all duration-300 overflow-y-auto">
+        <aside className="fixed top-0 right-0 z-40 flex h-full w-full sm:w-96 flex-col gap-5 bg-[#FCEDCC] text-black shadow-xl shadow-black/40 transition-all duration-300 overflow-y-auto">
           <div className="flex items-center justify-between bg-green-500 px-5 py-3 sticky top-0 z-10">
             <p className="text-md text-center font-bold text-black">
               Pedido entregado

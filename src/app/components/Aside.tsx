@@ -230,15 +230,15 @@ export default function Aside() {
           <img alt="Logo Burgerli" className="mx-auto w-auto" src="/logo.png" />
           <p className="my-5 text-center text-2xl font-bold">Administrador</p>
           <ul className="flex flex-col items-start gap-8">
-            <Link href="/admin" className="flex items-center gap-3">
+            <Link href="/admin" className="flex items-center gap-3" onClick={closeMenu}>
               <Analiticas />
               <p>Anatilicas</p>
             </Link>
-            <Link href="/menu" className="flex items-center gap-3">
+            <Link href="/menu" className="flex items-center gap-3" onClick={closeMenu}>
               <Pedidos />
               <p>Menu</p>
             </Link>
-            <Link href="orders-history" className="flex items-center gap-3">
+            <Link href="orders-history" className="flex items-center gap-3" onClick={closeMenu}>
               <Historial />
               <p>Historial de compras</p>
             </Link>

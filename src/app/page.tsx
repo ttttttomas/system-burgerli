@@ -7,7 +7,7 @@ import { useSession } from "./context/SessionContext";
 type UserRole = "admin" | "employed";
 
 const ROLE_ROUTE: Record<UserRole, string> = {
-  admin: "/change-local-status",
+  admin: "/admin",
   employed: "/pedidos",
 };
 
