@@ -645,7 +645,7 @@ export default function AdminPage() {
           <p className="text-white text-xl md:text-2xl font-semibold mb-4">
             Ingresos totales
           </p>
-          <ResponsiveContainer width="100%" height={400} className="md:h-[500px] lg:h-[600px]">
+          <ResponsiveContainer width="100%" height={600} className="md:h-[500px]">
             <AreaChart
               data={chartData}
               margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
@@ -684,7 +684,7 @@ export default function AdminPage() {
                 stroke="#EEAA4B"
                 fillOpacity={1}
                 fill="url(#colorCurrent)"
-                name="Esta semana"
+                name={selectedFilter === "week" ? "Esta semana" : selectedFilter === "month" ? "Este mes" : "Este año"}
               />
               <Area
                 type="monotone"
@@ -692,7 +692,7 @@ export default function AdminPage() {
                 stroke="#82ca9d"
                 fillOpacity={1}
                 fill="url(#colorPrevious)"
-                name="Semana pasada"
+                name={selectedFilter === "week" ? "Semana pasada" : selectedFilter === "month" ? "Mes pasado" : "Año pasado"}
               />
             </AreaChart>
           </ResponsiveContainer>
