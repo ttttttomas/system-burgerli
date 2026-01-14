@@ -37,3 +37,22 @@ export type SessionUser = {
   local: string;
   rol: string;
 };
+
+export type CreatePromoInput = {
+  name: string;
+  description: string;
+  quantity: number;
+  price: number;
+  imageFile: File;
+  description_list?: string[];
+};
+
+export type UpdatePromoInput = {
+  name: string;
+  description: string;
+  quantity: number;
+  price: number;
+  stock?: boolean;
+  image: string; // OJO: string (url/ruta), NO File
+  description_list?: string[];
+};

@@ -45,18 +45,22 @@ type SortField = "name" | "price" | "quantity" | "revenue" | "percentage" | "var
 type SortDirection = "asc" | "desc";
 
 export default function AdminPage() {
-  const { orders: getOrders } = useSession();
+  const { orders: getOrders, locals: getLocals } = useSession();
   const [allOrders, setAllOrders] = useState<Orders[]>([]);
+  const [availableLocals, setAvailableLocals] = useState<string[]>([]);
+  const [selectedLocal, setSelectedLocal] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<FilterType>("week");
   const [sortField, setSortField] = useState<SortField>("revenue");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
-  // Cargar todas las órdenes al montar el componente
+  // Cargar todas las órdenes y locales al montar el componente
   useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
+        
+        // Cargar órdenes
         const ordersData = await getOrders();
         console.log("📦 Órdenes cargadas:", ordersData);
         
@@ -68,15 +72,27 @@ export default function AdminPage() {
         }
         
         setAllOrders(ordersData || []);
+        
+        // Cargar locales disponibles
+        const localsData = await getLocals();
+        console.log("🏪 Locales cargados:", localsData);
+        
+        // Extraer solo los nombres de los locales
+        const localNames = Array.isArray(localsData) 
+          ? localsData.map((local: any) => local.name || local)
+          : [];
+        console.log("🏪 Nombres de locales extraídos:", localNames);
+        setAvailableLocals(localNames);
       } catch (error) {
-        console.error("❌ Error cargando órdenes:", error);
+        console.error("❌ Error cargando datos:", error);
         setAllOrders([]);
+        setAvailableLocals([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrders();
+    fetchData();
   }, []);
 
   // Función para parsear productos de una orden
@@ -152,6 +168,14 @@ export default function AdminPage() {
     };
   };
 
+  // Filtrar órdenes por local
+  const filterOrdersByLocal = (orders: Orders[]): Orders[] => {
+    if (selectedLocal === "all") {
+      return orders;
+    }
+    return orders.filter((order) => order.local === selectedLocal);
+  };
+
   // Filtrar órdenes por rango de fechas
   const filterOrdersByDateRange = (
     orders: Orders[],
@@ -168,15 +192,18 @@ export default function AdminPage() {
   // Calcular métricas usando useMemo para optimizar
   const metrics = useMemo((): Metrics => {
     const dateRange = getDateRange(selectedFilter);
+    
+    // Primero filtrar por local, luego por fecha
+    const localFilteredOrders = filterOrdersByLocal(allOrders);
 
     const currentOrders = filterOrdersByDateRange(
-      allOrders,
+      localFilteredOrders,
       dateRange.current.start,
       dateRange.current.end
     );
 
     const previousOrders = filterOrdersByDateRange(
-      allOrders,
+      localFilteredOrders,
       dateRange.previous.start,
       dateRange.previous.end
     );
@@ -205,20 +232,23 @@ export default function AdminPage() {
       previousTotalSales,
       previousTotalRevenue,
     };
-  }, [allOrders, selectedFilter]);
+  }, [allOrders, selectedFilter, selectedLocal]);
 
   // Calcular estadísticas de productos
   const productStats = useMemo((): ProductStats[] => {
     const dateRange = getDateRange(selectedFilter);
+    
+    // Primero filtrar por local, luego por fecha
+    const localFilteredOrders = filterOrdersByLocal(allOrders);
 
     const currentOrders = filterOrdersByDateRange(
-      allOrders,
+      localFilteredOrders,
       dateRange.current.start,
       dateRange.current.end
     );
 
     const previousOrders = filterOrdersByDateRange(
-      allOrders,
+      localFilteredOrders,
       dateRange.previous.start,
       dateRange.previous.end
     );
@@ -342,7 +372,7 @@ export default function AdminPage() {
     });
 
     return sortedArray;
-  }, [allOrders, selectedFilter, metrics.totalRevenue, sortField, sortDirection]);
+  }, [allOrders, selectedFilter, selectedLocal, metrics.totalRevenue, sortField, sortDirection]);
 
   // Función para manejar el cambio de ordenamiento
   const handleSort = (field: SortField) => {
@@ -368,6 +398,9 @@ export default function AdminPage() {
   const chartData = useMemo((): ChartDataPoint[] => {
     const dateRange = getDateRange(selectedFilter);
     const data: ChartDataPoint[] = [];
+    
+    // Filtrar por local primero
+    const localFilteredOrders = filterOrdersByLocal(allOrders);
 
     // Determinar el número de puntos según el filtro
     let points = 7;
@@ -395,12 +428,12 @@ export default function AdminPage() {
       prevNextDate.setDate(prevNextDate.getDate() + interval);
 
       const currentDayOrders = filterOrdersByDateRange(
-        allOrders,
+        localFilteredOrders,
         currentDate,
         nextDate
       );
       const previousDayOrders = filterOrdersByDateRange(
-        allOrders,
+        localFilteredOrders,
         previousDate,
         prevNextDate
       );
@@ -444,7 +477,7 @@ export default function AdminPage() {
     }
 
     return data;
-  }, [allOrders, selectedFilter]);
+  }, [allOrders, selectedFilter, selectedLocal]);
 
   // Calcular variación de ingresos
   const revenueVariation = useMemo(() => {
@@ -484,12 +517,20 @@ export default function AdminPage() {
       {/* Header */}
       <section className="flex items-center justify-between pt-6 pb-8">
         <h1 className="text-3xl  mx-10 font-semibold">Analítica - General</h1>
-        <button
-          className="rounded-xl bg-[#EEAA4B]  mx-10 px-5 py-2 text-lg font-medium hover:bg-[#d99a3b] transition-colors"
-          type="button"
-        >
-          Vista general
-        </button>
+        <div className="mx-10">
+          <select
+            value={selectedLocal}
+            onChange={(e) => setSelectedLocal(e.target.value)}
+            className="rounded-lg bg-[#EEAA4B] px-4 py-2 text-xl font-medium hover:bg-[#d99a3b] transition-colors cursor-pointer outline-none border-none"
+          >
+            <option value="all" >Vista general</option>
+            {availableLocals.map((local, index) => (
+              <option key={`local-${index}-${local}`} value={local}>
+                {local.charAt(0).toUpperCase() + local.slice(1)}
+              </option>
+            ))}
+          </select>
+        </div>
       </section>
 
       {/* Sección principal: Filtros + Métricas + Gráfico */}

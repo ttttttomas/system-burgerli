@@ -9,6 +9,7 @@ import Pedidos from "./Pedidos";
 import Historial from "./Historial";
 import Analiticas from "./Analiticas";
 import Store from "./Store";
+import Horarios from "./Horarios"
 import { toast } from "sonner";
 
 
@@ -233,10 +234,10 @@ export default function Aside() {
               <Analiticas />
               <p>Anatilicas</p>
             </Link>
-            <div className="flex items-center text-gray-500 gap-3">
+            <Link href="/menu" className="flex items-center gap-3">
               <Pedidos />
               <p>Menu</p>
-            </div>
+            </Link>
             <Link href="orders-history" className="flex items-center gap-3">
               <Historial />
               <p>Historial de compras</p>
@@ -249,6 +250,10 @@ export default function Aside() {
               <Store />
               <p>Locales</p>
             </Link>
+            <p className="flex items-center gap-3">
+              <Horarios />
+              <p className="text-gray-500">Horarios</p>
+            </p>
           </ul>
           <button
             onClick={() => {

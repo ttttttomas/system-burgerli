@@ -89,18 +89,32 @@ export default function OrderHistoryPage() {
         .toLowerCase()
         .includes(searchClient.toLowerCase());
 
-      // Filtro por fecha (solo día, sin hora)
-      const orderDate = order.created_at
-        ? new Date(order.created_at).toLocaleDateString("es-AR")
-        : "";
-      const matchesDate = orderDate.includes(searchDate);
+      // Filtro por fecha (comparación exacta por día en zona horaria local)
+      let matchesDate = true;
+      if (searchDate) {
+        if (order.created_at) {
+          const orderDate = new Date(order.created_at);
+          const year = orderDate.getFullYear();
+          const month = String(orderDate.getMonth() + 1).padStart(2, '0');
+          const day = String(orderDate.getDate()).padStart(2, '0');
+          const localDateStr = `${year}-${month}-${day}`;
+          matchesDate = localDateStr === searchDate;
+        } else {
+          matchesDate = false;
+        }
+      }
 
       // Filtro por método de pago
-      const paymentMethodText =
-        order.payment_method === "account_money" ? "mercado pago" : "efectivo";
-      const matchesPayment = paymentMethodText.includes(
-        searchPaymentMethod.toLowerCase()
-      );
+      let matchesPayment = true;
+      if (searchPaymentMethod && searchPaymentMethod !== "all") {
+        if (searchPaymentMethod === "efectivo") {
+          // Efectivo puede venir como "cash" o "efectivo"
+          matchesPayment = order.payment_method === "Efectivo";
+        } else if (searchPaymentMethod === "mercadopago") {
+          // Mercado Pago es todo lo que NO sea efectivo
+          matchesPayment = order.payment_method !== "Efectivo";
+        }
+      }
 
       // Filtro por local (solo para admin)
       const matchesLocal = selectedLocal === "all" || order.local === selectedLocal;
@@ -150,24 +164,23 @@ export default function OrderHistoryPage() {
           />
         </div>
         <div className="flex w-64 items-center gap-2 rounded-xl bg-[#EEAA4B] px-4 py-2">
-          <Lupa />
           <input
-            className="flex-1 bg-transparent font-medium placeholder:text-black/70 focus:outline-none"
-            placeholder="Buscar por fecha"
-            type="text"
+            className="flex-1 bg-transparent font-medium focus:outline-none cursor-pointer"
+            type="date"
             value={searchDate}
             onChange={(e) => setSearchDate(e.target.value)}
           />
         </div>
         <div className="flex w-64 items-center gap-2 rounded-xl bg-[#EEAA4B] px-4 py-2">
-          <Lupa />
-          <input
-            className="flex-1 bg-transparent font-medium placeholder:text-black/70 focus:outline-none"
-            placeholder="Buscar por método de pago"
-            type="text"
+          <select
+            className="flex-1 bg-transparent font-medium focus:outline-none cursor-pointer"
             value={searchPaymentMethod}
             onChange={(e) => setSearchPaymentMethod(e.target.value)}
-          />
+          >
+            <option value="all">Todos los métodos</option>
+            <option value="efectivo">Efectivo</option>
+            <option value="mercadopago">Mercado Pago</option>
+          </select>
         </div>
         
         {/* Filtro por local - Solo para admin */}
