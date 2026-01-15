@@ -123,6 +123,9 @@ export default function OrderHistoryPage() {
     });
   }, [orders, searchClient, searchDate, searchPaymentMethod, selectedLocal]);
 
+  const totalMoney = filteredOrders.reduce((acc, order) => acc + order.price, 0);
+  const totalOrders = filteredOrders.length;
+
   if (loading) {
     return (
       <main className="flex h-screen items-center justify-center px-4 md:px-6 lg:ml-72 lg:px-10">
@@ -163,7 +166,7 @@ export default function OrderHistoryPage() {
             onChange={(e) => setSearchClient(e.target.value)}
           />
         </div>
-        <div className="flex w-full sm:w-64 items-center gap-2 rounded-xl bg-[#EEAA4B] px-4 py-2">
+        <div className="flex w-64 items-center gap-2 rounded-xl bg-[#EEAA4B] px-4 py-2">
           <input
             className="flex-1 bg-transparent font-medium focus:outline-none cursor-pointer"
             type="date"
@@ -199,6 +202,20 @@ export default function OrderHistoryPage() {
             </select>
           </div>
         )}
+        {searchDate && (<div className="flex flex-col w-full font-semibold sm:w-82 items-center gap-2 rounded-xl bg-[#EEAA4B] py-2">
+          <div className="flex items-center justify-between w-full px-4">
+            <small>Dia seleccionado:</small>
+            <p>{searchDate}</p>
+          </div>
+          <div className="flex items-center justify-between w-full px-4">
+            <small>Total:</small>
+            <p>$ {totalMoney.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</p>
+          </div>
+          <div className="flex items-center justify-between w-full px-4">
+            <small>Numero de ordenes:</small>
+            <p>{totalOrders}</p>
+          </div>
+        </div>)}
       </section>
 
       {/* Tabla de órdenes */}
