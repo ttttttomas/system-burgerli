@@ -439,6 +439,7 @@ export default function MainMenuGestion() {
                 ? data.quantity
                 : parseInt(data.quantity || "0") || 0,
             price: parseFloat(data.price),
+            options: data.options || [],
             stock: true,
             image: (typeof data.image === "string" ? data.image : "") || "",
             description_list: data.description_list || [],

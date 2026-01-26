@@ -12,7 +12,6 @@ import Store from "./Store";
 import Horarios from "./Horarios"
 import { toast } from "sonner";
 
-
 interface Local {
   id: string;
   name: string;
@@ -200,7 +199,7 @@ export default function Aside() {
             ) : null}
           </div>
 
-          <ul className="flex flex-col items-start gap-5 text-white">
+          <ul className="flex flex-col items-start gap-8 text-white">
             <Link className="flex items-center gap-3" href="/" onClick={closeMenu}>
               <Pedidos />
               <p>Pedidos</p>
@@ -208,6 +207,10 @@ export default function Aside() {
             <Link className="flex items-center gap-3" href="/orders" onClick={closeMenu}>
               <Historial />
               <p>Historial de pedidos</p>
+            </Link>
+            <Link className="flex items-center gap-3" href="/stock" onClick={closeMenu}>
+              <Pedidos />
+              <p>Stock</p>
             </Link>
           </ul>
           <button

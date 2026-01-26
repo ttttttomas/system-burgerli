@@ -59,7 +59,6 @@ export default function useProducts() {
         return null;
       }
       if (response.status === 200) {
-        console.log(response.data);
         return response.data;
       }
     } catch (error) {
@@ -182,6 +181,31 @@ export default function useProducts() {
       }
     }
   };
+
+  const getLocalByName = async (name: any) => {
+    try {
+      const response = await axios.get(
+        `https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/getLocal/${name}`,
+      );
+      if (!response) {
+        return null;
+      }
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (error) {
+      console.log(error);
+      if (axios.isAxiosError(error) && error.response) {
+        if (error.response.status === 400) {
+          console.error("Invalid username or password");
+        } else {
+          console.error(error);
+        }
+      } else {
+        console.error("An unexpected error occurred");
+      }
+    }
+  };
   return {
     getBurgers,
     getDrinks,
@@ -190,5 +214,50 @@ export default function useProducts() {
     getFries,
     getCoupons,
     createOrder,
+    getLocalByName,
+    toggleBurgerStock: async (id: string, localId: string, hasStock: boolean) => {
+      try {
+        await axios.patch(
+          `https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/burgers/${id}/stock/${localId}`,
+          { has_stock: hasStock }
+        );
+      } catch (error) {
+        console.error("Error toggling burger stock:", error);
+        throw error;
+      }
+    },
+    toggleFriesStock: async (id: string, localId: string, hasStock: boolean) => {
+      try {
+        await axios.patch(
+          `https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/fries/${id}/stock/${localId}`,
+          { has_stock: hasStock }
+        );
+      } catch (error) {
+        console.error("Error toggling fries stock:", error);
+        throw error;
+      }
+    },
+    toggleDrinkStock: async (id: string, localId: string, hasStock: boolean) => {
+      try {
+        await axios.patch(
+          `https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/drinks/${id}/stock/${localId}`,
+          { has_stock: hasStock }
+        );
+      } catch (error) {
+        console.error("Error toggling drink stock:", error);
+        throw error;
+      }
+    },
+    togglePromoStock: async (id: string, localId: string, hasStock: boolean) => {
+      try {
+        await axios.patch(
+          `https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/promos/${id}/stock/${localId}`,
+          { has_stock: hasStock }
+        );
+      } catch (error) {
+        console.error("Error toggling promo stock:", error);
+        throw error;
+      }
+    },
   };
 }
