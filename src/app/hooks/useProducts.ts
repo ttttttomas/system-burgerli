@@ -106,7 +106,8 @@ export default function useProducts() {
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(order), // <-- objeto, NO array
+        credentials: "include",
+        body: JSON.stringify(order),
       },
     );
 

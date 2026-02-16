@@ -212,6 +212,10 @@ export default function Aside() {
               <Pedidos />
               <p>Stock</p>
             </Link>
+            <Link className="flex items-center gap-3" href="/create-order" onClick={closeMenu}>
+              <Pedidos />
+              <p>Crear orden manual</p>
+            </Link>
           </ul>
           <button
             onClick={() => {

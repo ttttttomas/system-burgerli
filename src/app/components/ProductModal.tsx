@@ -24,6 +24,8 @@ interface ProductData {
   price_list?: number[];
   ingredients?: string[];
   description_list?: string[];
+  coupon_type?: string;
+  coupon_tope?: string;
 }
 
 interface ProductModalProps {
@@ -250,7 +252,8 @@ export default function ProductModal({
   };
 
   if (!isOpen) return null;
-
+  console.log(category);
+  
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-xl shadow-2xl">
@@ -340,7 +343,7 @@ export default function ProductModal({
                   {category === "Hamburguesas" && <p className="text-sm text-gray-500">Precio del producto base (Tamaño simple)</p>}
                   <input
                     type="text"
-                    placeholder="Precio del producto base"
+                    placeholder={category === "Cupones" ? "Monto o porcentaje de descuento (SOLO EL NUMERO)" : "Precio del producto base"}
                     value={formData.price}
                     onChange={(e) =>
                       setFormData({ ...formData, price: e.target.value })
@@ -348,6 +351,33 @@ export default function ProductModal({
                     className="w-full px-4 py-3 bg-[#5a4a3a] text-white placeholder-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f2b24c]"
                     required
                   />
+                  </>
+                )}
+
+                {/* Campos específicos de Cupones */}
+                {category === "Cupones" && (
+                  <>
+                    <select
+                      value={formData.coupon_type || ""}
+                      onChange={(e) =>
+                        setFormData({ ...formData, coupon_type: e.target.value })
+                      }
+                      className="w-full px-4 py-3 bg-[#5a4a3a] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f2b24c]"
+                      required
+                    >
+                      <option value="" disabled>Tipo de cupón</option>
+                      <option value="amount">Monto fijo ($)</option>
+                      <option value="porcent">Porcentaje (%)</option>
+                    </select>
+                    <input
+                      type="text"
+                      placeholder="Tope de descuento (0 = sin tope)"
+                      value={formData.coupon_tope || ""}
+                      onChange={(e) =>
+                        setFormData({ ...formData, coupon_tope: e.target.value })
+                      }
+                      className="w-full px-4 py-3 bg-[#5a4a3a] text-white placeholder-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f2b24c]"
+                    />
                   </>
                 )}
 

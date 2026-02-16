@@ -57,6 +57,8 @@ interface ProductData {
   price_list?: number[];
   ingredients?: string[];
   description_list?: string[];
+  coupon_type?: string;
+  coupon_tope?: string;
 }
 
 function StockToggle({
@@ -550,6 +552,8 @@ export default function MainMenuGestion() {
           body = JSON.stringify({
             name: data.name,
             amount: Number(data.price || 0),
+            type: data.coupon_type || "fixed",
+            tope: Number(data.coupon_tope || 0),
           });
         } else {
           body = formData;
