@@ -1,5 +1,5 @@
 "use client";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 
 import PopupIcon from "./PopupIcon";
 import NewOrderCard from "./NewOrderCard";
@@ -20,6 +20,16 @@ export default function PopupOrders({orders, onMoveToPreparation, onCancelOrder}
     setIsOpen(!isOpen);
   };
 
+  // Cerrar con Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [isOpen]);
+
   const orderCount = orders.length;
 
   const count = orderCount > 9 ? "+9" : orderCount;
@@ -28,7 +38,7 @@ export default function PopupOrders({orders, onMoveToPreparation, onCancelOrder}
     <section>
       {/*  Blur overlay */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/70" /> // sin blur
+        <div className="fixed inset-0 bg-black/70 cursor-pointer" onClick={() => setIsOpen(false)} />
       )}
       <div
         className={

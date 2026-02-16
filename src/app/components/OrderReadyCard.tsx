@@ -182,6 +182,19 @@ export default function OrderReadyCard({
                 ? " Efectivo"
                 : " Mercado Pago"}
             </b>
+            {selectedOrder.coupon && (
+              <div className="mt-2 text-start">
+                <b>
+                  Cupón:{" "}
+                  <span className="text-red-600">{selectedOrder.coupon}</span>
+                </b>
+                {selectedOrder.coupon_amount && (
+                  <p className="text-sm text-green-700 font-semibold">
+                    Descuento: -${selectedOrder.coupon_amount.toLocaleString()}
+                  </p>
+                )}
+              </div>
+            )}
             {selectedOrder.order_notes && (
               <>
                 <h3 className="my-5 text-center font-bold underline">

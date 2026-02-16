@@ -57,7 +57,7 @@ export default function NewOrderCard({
   };
 
   const obj = parseLineItems(order.products);
-
+  
   return (
     <>
       <div
@@ -124,6 +124,14 @@ export default function NewOrderCard({
                   <div className="flex gap-2">
                     <p className="font-normal">Direccion:</p>
                     <b>{selectedOrder.address}</b>
+                  </div>
+                )}
+                {selectedOrder.coupon && (
+                  <div className="flex flex-col gap-1">
+                    <div className="flex gap-2">
+                      <p className="font-normal">Cupon aplicado:</p>
+                      <b>{selectedOrder.coupon}</b>
+                    </div>
                   </div>
                 )}
               </div>
@@ -251,18 +259,19 @@ export default function NewOrderCard({
                   <span>Total</span>
                   <span>${selectedOrder.price.toLocaleString()}</span>
                 </div>
-                <div className="mt-3 flex items-center justify-center gap-5 text-sm">
-                  <span>Pago:</span>
+                <div className="mt-3 flex items-center justify-between gap-5">
+                  {selectedOrder.coupon_amount && (
+                      <p className="text-green-700 font-semibold">
+                        Descuento: -${selectedOrder.coupon_amount.toLocaleString()}
+                      </p>
+                    )}
+                  
                   <div className="flex items-center gap-2">
-                    <span>
-                      {" "}
+                      <span>Pago:</span>
                       {selectedOrder.payment_method === "Efectivo"
                         ? " Efectivo"
                         : " Mercado Pago"}
-                    </span>
-                    <span>
                       <Tarjeta />
-                    </span>
                   </div>
                 </div>
               </div>

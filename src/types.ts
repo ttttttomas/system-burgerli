@@ -2,6 +2,7 @@ export type Orders = {
   id_order?: string;
   created_at?: string; // VIENEN CREADOS DESDE LA BASE DE DATOS
   payment_method: string;
+  delivery_time: string;
   delivery_mode: string;
   price: number;
   status: string;
@@ -11,6 +12,7 @@ export type Orders = {
   phone: number;
   email: string;
   address: string | null;
+  coupon_amount?: number | null;
   coupon?: string | null;
   fries?: string | null;
   drinks?: string | null;

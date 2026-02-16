@@ -301,7 +301,7 @@ export function OrdersContextProvider({ children }: { children: ReactNode }) {
       setOrdersReady((prev) =>
         prev.filter((order) => order.id_order !== orderId),
       );
-
+      // fetch(`http://localhost:8000/${orderId}/status`, {
       fetch(`https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/${orderId}/status`, {
         method: "PATCH",
         credentials: "include",
@@ -415,6 +415,8 @@ export function OrdersContextProvider({ children }: { children: ReactNode }) {
 
             if (pedidoLocal === sessionLocal) {
               toast.success("Pedido agregado exitosamente");
+              console.log("📦 Pedido recibido por WebSocket:", msg.pedido);
+              
               setNewOrders((prevOrders) => [
                 ...prevOrders,
                 { ...msg.pedido, status: "Nuevo" },

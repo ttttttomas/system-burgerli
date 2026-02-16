@@ -88,7 +88,6 @@ export default function OrderHistoryPage() {
       const matchesClient = order.name
         .toLowerCase()
         .includes(searchClient.toLowerCase());
-
       // Filtro por fecha (comparación exacta por día en zona horaria local)
       let matchesDate = true;
       if (searchDate) {
@@ -99,6 +98,9 @@ export default function OrderHistoryPage() {
           const day = String(orderDate.getDate()).padStart(2, '0');
           const localDateStr = `${year}-${month}-${day}`;
           matchesDate = localDateStr === searchDate;
+          console.log("localDateStr",localDateStr);
+          console.log("searchDate",searchDate);
+          
         } else {
           matchesDate = false;
         }
@@ -115,7 +117,6 @@ export default function OrderHistoryPage() {
           matchesPayment = order.payment_method !== "Efectivo";
         }
       }
-
       // Filtro por local (solo para admin)
       const matchesLocal = selectedLocal === "all" || order.local === selectedLocal;
 
@@ -125,6 +126,7 @@ export default function OrderHistoryPage() {
 
   const totalMoney = filteredOrders.reduce((acc, order) => acc + order.price, 0);
   const totalOrders = filteredOrders.length;
+  console.log("orders",filteredOrders)
 
   if (loading) {
     return (

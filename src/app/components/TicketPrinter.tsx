@@ -83,6 +83,15 @@ export function buildReceipt(order: Orders) {
 
       <Br />
       <Line />
+
+      {/* Descuento por cupón */}
+      {order.coupon_amount && (
+        <>
+          <Row left={`Cupón: ${order.coupon || ''}`} right={`-$${order.coupon_amount.toFixed(2)}`} />
+          <Line />
+        </>
+      )}
+
       {/* Sección de desglose de precios */}
       
       {order.payment_method === "Efectivo" 

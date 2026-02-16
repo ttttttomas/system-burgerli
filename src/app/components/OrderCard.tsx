@@ -98,25 +98,25 @@ export default function OrderCard({
   };
 
   const obj = parseLineItems(order.products);
-  console.log(obj);
+  console.log(order);
   const date = order?.created_at;
   const formatted = date?.replace(" ", "T") + "Z";
 
-
-const safe = formatted
-  .replace("Z", "")              // sacás el Z duplicado
-  .replace("+00:00", "Z")        // dejás solo el Z
-  .replace(/(\.\d{3})\d+Z$/, "$1Z"); // recortás a 3 decimales
- const date2 = new Date(safe);
- console.log(date2);
-const dayAR = date2.toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" });
-const timeAR = date2.toLocaleTimeString("es-AR", {
-  timeZone: "America/Argentina/Buenos_Aires",
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-});
-
+  const safe = formatted
+    .replace("Z", "") // sacás el Z duplicado
+    .replace("+00:00", "Z") // dejás solo el Z
+    .replace(/(\.\d{3})\d+Z$/, "$1Z"); // recortás a 3 decimales
+  const date2 = new Date(safe);
+  console.log(date2);
+  const dayAR = date2.toLocaleDateString("es-AR", {
+    timeZone: "America/Argentina/Buenos_Aires",
+  });
+  const timeAR = date2.toLocaleTimeString("es-AR", {
+    timeZone: "America/Argentina/Buenos_Aires",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 
   return (
     <section className={`${inter.className} relative`}>
@@ -131,7 +131,9 @@ const timeAR = date2.toLocaleTimeString("es-AR", {
           <div className="flex flex-col items-center rounded-t-xl bg-[#FD4E4E] px-5 py-1">
             <div className="flex w-full items-center justify-between">
               <small className="font-semibold text-white">
-                #{order.dailySequenceNumber?.toString().padStart(3, '0') || '---'}
+                #
+                {order.dailySequenceNumber?.toString().padStart(3, "0") ||
+                  "---"}
               </small>
               <small className="font-semibold">
                 {new Date().toLocaleTimeString()}
@@ -151,7 +153,11 @@ const timeAR = date2.toLocaleTimeString("es-AR", {
                     {product.size && <li>Tamaño: {product.size}</li>}
                     {(() => {
                       const selectedOpts = getSelectedOptions(product);
-                      return selectedOpts.length > 0 && <li>Opciones: {selectedOpts.join(", ")}</li>;
+                      return (
+                        selectedOpts.length > 0 && (
+                          <li>Opciones: {selectedOpts.join(", ")}</li>
+                        )
+                      );
                     })()}
                   </ul>
                 </div>
@@ -235,7 +241,11 @@ const timeAR = date2.toLocaleTimeString("es-AR", {
               <h2 className="text-center font-bold underline">
                 Forma de entrega
               </h2>
-              <p>{selectedOrder.delivery_mode == "pickup" ? 'Retiro en local' : 'Delivery'}</p>
+              <p>
+                {selectedOrder.delivery_mode == "pickup"
+                  ? "Retiro en local"
+                  : "Delivery"}
+              </p>
 
               <h3 className="text-center font-bold underline">Pedido</h3>
               <ul className="flex flex-col gap-1">
@@ -248,11 +258,15 @@ const timeAR = date2.toLocaleTimeString("es-AR", {
                         {product.size && <li>Tamaño: {product.size}</li>}
                         {(() => {
                           const selectedOpts = getSelectedOptions(product);
-                          return selectedOpts.length > 0 && (
-                            <div className="flex gap-2 items-center">
-                              <small className="font-semibold">Opciones:</small>
-                              <small>{selectedOpts.join(", ")}</small>
-                            </div>
+                          return (
+                            selectedOpts.length > 0 && (
+                              <div className="flex gap-2 items-center">
+                                <small className="font-semibold">
+                                  Opciones:
+                                </small>
+                                <small>{selectedOpts.join(", ")}</small>
+                              </div>
+                            )
                           );
                         })()}
                         {Array.isArray(product.sin) &&
@@ -282,10 +296,23 @@ const timeAR = date2.toLocaleTimeString("es-AR", {
 
               <b>
                 Pago:{" "}
-                 {selectedOrder.payment_method === "Efectivo"
-                      ? " Efectivo"
-                      : " Mercado Pago"}
+                {selectedOrder.payment_method === "Efectivo"
+                  ? " Efectivo"
+                  : " Mercado Pago"}
               </b>
+              {selectedOrder.coupon && (
+                <div className="mt-2 text-start">
+                  <b>
+                    Cupón:{" "}
+                    <span className="text-red-600">{selectedOrder.coupon}</span>
+                  </b>
+                  {selectedOrder.coupon_amount && (
+                    <p className="text-sm text-green-700 font-semibold">
+                      Descuento: -${selectedOrder.coupon_amount.toLocaleString()}
+                    </p>
+                  )}
+                </div>
+              )}
 
               {selectedOrder.order_notes && (
                 <>
