@@ -57,22 +57,23 @@ function buildReceiptHTML(order: Orders): string {
   <style>
     @page {
       size: 58mm auto;
-      margin: 4mm 2mm;
+      margin: 4mm 3mm;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: monospace;
-      font-size: 11px;
-      width: 54mm;
+      font-size: 16px;
+      width: 52mm;
       color: #000;
+      line-height: 1.5;
     }
     .center { text-align: center; }
-    .big { font-size: 16px; font-weight: bold; }
+    .big { font-size: 22px; font-weight: bold; }
     .bold { font-weight: bold; }
-    .line { border-top: 1px dashed #000; margin: 4px 0; }
-    .br { height: 6px; }
+    .line { border-top: 1px dashed #000; margin: 6px 0; }
+    .br { height: 10px; }
     .row { display: flex; justify-content: space-between; }
-    .sub { font-size: 10px; padding-left: 8px; }
+    .sub { font-size: 13px; padding-left: 10px; }
   </style>
 </head>
 <body>
