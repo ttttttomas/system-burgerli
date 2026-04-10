@@ -1,97 +1,147 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { render } from "react-thermal-printer";
-import { buildReceipt } from "@/app/components/TicketPrinter";
-import { Orders } from "@/types";
+import { useState } from "react";
+import { Orders, ProductsOrder } from "@/types";
 
+function buildReceiptHTML(order: Orders): string {
+  const rawItems = order.products;
+  const itemsArray = Array.isArray(rawItems) ? rawItems : [rawItems];
 
+  const total = order.price;
+  const comision = (total * 0.08) / 1.08;
+  const subtotal = total - comision;
+
+  const parseItem = (item: any): ProductsOrder =>
+    typeof item === "string" ? JSON.parse(item) : item;
+
+  const getSelectedOptions = (p: ProductsOrder): string[] =>
+    p.selected_options || p.selectedOptions || [];
+
+  const itemsHTML = itemsArray
+    .map((item) => {
+      const p = parseItem(item);
+      const opts = getSelectedOptions(p);
+      return `
+        <div class="row">
+          <span>${p.quantity}x ${(p.name || "").slice(0, 22)}</span>
+          <span>$${p.price}</span>
+        </div>
+        ${p.size ? `<div class="sub">+ Tamaño: ${p.size}</div>` : ""}
+        ${p.sin && p.sin.length ? `<div class="sub">+ Sin: ${p.sin.join(", ")}</div>` : ""}
+        ${p.fries ? `<div class="sub">+ Papas: ${p.fries}</div>` : ""}
+        ${opts.length ? `<div class="sub">+ Opciones: ${opts.join(", ")}</div>` : ""}
+        ${(p as any).notes ? `<div class="sub">* ${(p as any).notes}</div>` : ""}
+      `;
+    })
+    .join("");
+
+  const couponHTML =
+    order.coupon_amount
+      ? `<div class="row"><span>Cupón: ${order.coupon || ""}</span><span>-$${order.coupon_amount.toFixed(2)}</span></div><div class="line"></div>`
+      : "";
+
+  const totalsHTML =
+    order.payment_method === "Efectivo"
+      ? `<div class="row bold"><span>Total</span><span>$${total.toFixed(2)}</span></div>`
+      : `
+          <div class="row"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
+          <div class="row"><span>Servicio (8%)</span><span>$${comision.toFixed(2)}</span></div>
+          <div class="line"></div>
+          <div class="row bold"><span>TOTAL</span><span>$${total.toFixed(2)}</span></div>
+        `;
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    @page {
+      size: 58mm auto;
+      margin: 4mm 2mm;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: monospace;
+      font-size: 11px;
+      width: 54mm;
+      color: #000;
+    }
+    .center { text-align: center; }
+    .big { font-size: 16px; font-weight: bold; }
+    .bold { font-weight: bold; }
+    .line { border-top: 1px dashed #000; margin: 4px 0; }
+    .br { height: 6px; }
+    .row { display: flex; justify-content: space-between; }
+    .sub { font-size: 10px; padding-left: 8px; }
+  </style>
+</head>
+<body>
+  <div class="center big">BURGERLI</div>
+  <div class="center">${order.local}</div>
+  <div class="br"></div>
+  <div class="line"></div>
+  <div class="bold">CLIENTE:</div>
+  <div>Nombre: ${order.name || "N/A"}</div>
+  ${order.phone ? `<div>Tel: ${order.phone}</div>` : ""}
+  ${order.email ? `<div>Email: ${order.email}</div>` : ""}
+  ${order.address ? `<div>Dirección: ${order.address}</div>` : ""}
+  ${order.payment_method ? `<div>Pago: ${order.payment_method === "Efectivo" ? "Efectivo" : "Mercado Pago"}</div>` : ""}
+  <div class="line"></div>
+  <div class="row"><span>ORDEN</span><span>#${order.dailySequenceNumber?.toString().padStart(3, "0") || "---"}</span></div>
+  <div class="row"><span>FECHA</span><span>${new Date().toLocaleDateString()}</span></div>
+  <div class="line"></div>
+  <div class="br"></div>
+  ${itemsHTML}
+  <div class="br"></div>
+  <div class="line"></div>
+  ${couponHTML}
+  ${totalsHTML}
+  <div class="line"></div>
+  <div class="br"></div>
+  <div class="center">¡Gracias por tu compra!</div>
+</body>
+</html>`;
+}
 
 export default function TicketPrintButton({ order }: { order: Orders }) {
-  const characteristicRef = useRef<BluetoothRemoteGATTCharacteristic | null>(null);
   const [loading, setLoading] = useState(false);
-  const [connected, setConnected] = useState(false);
 
-  const connectPrinter = async () => {
-    try {
-      // Usamos 'acceptAllDevices' para que aparezca en la lista sí o sí
-      const device = await (navigator as any).bluetooth.requestDevice({
-        acceptAllDevices: true,
-        optionalServices: [
-          "0000ff00-0000-1000-8000-00805f9b34fb", // El más común en impresoras térmicas
-          "000018f0-0000-1000-8000-00805f9b34fb"  // Alternativo
-        ]
-      });
-  
-      const server = await device.gatt.connect();
-      
-      // Intentamos obtener el servicio primario
-      const service = await server.getPrimaryService("0000ff00-0000-1000-8000-00805f9b34fb");
-      const characteristic = await service.getCharacteristic("0000ff02-0000-1000-8000-00805f9b34fb");
-  
-      characteristicRef.current = characteristic;
-      setConnected(true);
-      alert("Conectado a: " + device.name);
-    } catch (err) {
-      console.error("Error conectando:", err);
-      alert("Error de conexión. Revisa la consola.");
-    }
-  };
-  const printTicket = async () => {
-    if (!characteristicRef.current) {
-      await connectPrinter();
-      if (!characteristicRef.current) return;
-    }
-
+  const printTicket = () => {
     setLoading(true);
-    try {
-      const receipt = buildReceipt(order);
-      const data = await render(receipt);
-  
-      const chunkSize = 20; 
-      for (let i = 0; i < data.length; i += chunkSize) {
-        const chunk = data.slice(i, i + chunkSize);
-        
-        // Intentamos usar el método más rápido y compatible
-        if (characteristicRef.current.writeValueWithoutResponse) {
-          await characteristicRef.current.writeValueWithoutResponse(chunk);
-        } else {
-          await characteristicRef.current.writeValue(chunk);
-        }
-  
-        // ESTO ES VITAL: Esperar 30ms entre paquetes para no saturar a la Global
-        await new Promise(r => setTimeout(r, 30)); 
-      }
-  
-      alert("¡Ticket impreso!");
-    } catch (err) {
-      console.error("Error al imprimir:", err);
-      alert("Error de comunicación con la impresora.");
-    } finally {
+    const html = buildReceiptHTML(order);
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, "_blank", "width=300,height=600");
+    if (!win) {
+      alert("El navegador bloqueó la ventana emergente. Permitila para imprimir.");
+      URL.revokeObjectURL(url);
       setLoading(false);
+      return;
     }
+    win.addEventListener("load", () => {
+      const heightPx = win.document.body.scrollHeight;
+      const heightMm = Math.ceil(heightPx * 0.2646) + 6;
+      const dynStyle = win.document.createElement("style");
+      dynStyle.textContent = `@page { size: 58mm ${heightMm}mm !important; margin: 2mm; }`;
+      win.document.head.appendChild(dynStyle);
+      win.focus();
+      win.print();
+      setLoading(false);
+      win.addEventListener("afterprint", () => {
+        win.close();
+        URL.revokeObjectURL(url);
+      });
+    });
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <button
-        type="button"
-        onClick={printTicket}
-        className="rounded-xl border-2 cursor-pointer border-dashed border-[#EEAA4B] py-2 font-bold text-black"
-        disabled={loading}
-      >
-        {loading ? "Imprimiendo..." : "Imprimir ticket"}
-      </button>
-
-      {!connected && (
-        <button
-          type="button"
-          onClick={connectPrinter}
-          className="px-3 py-2 rounded underline cursor-pointer border text-sm"
-        >
-          Conectar impresora Bluetooth
-        </button>
-      )}
-    </div>
+    <button
+      type="button"
+      onClick={printTicket}
+      className="rounded-xl border-2 cursor-pointer border-dashed border-[#EEAA4B] py-2 font-bold text-black"
+      disabled={loading}
+    >
+      {loading ? "Imprimiendo..." : "Imprimir ticket"}
+    </button>
   );
 }
