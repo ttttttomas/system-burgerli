@@ -107,7 +107,6 @@ function Section({
   onAdd: () => void;
   onToggleStock: (index: number) => void;
 }) {
-  
   return (
     <section className="space-y-3 w-full">
       <h2 className="text-[14px] sm:text-[15px] font-semibold text-neutral-800 px-1">
@@ -115,21 +114,22 @@ function Section({
       </h2>
 
       {/* Estado vacío para Cupones */}
-      {title === "Promos" && (!rows || rows.length === 0) || title === "Cupones" && (!rows || rows.length === 0) && (
-        <div className="flex flex-col items-center justify-center py-12 px-4 bg-[#f3e3bf] rounded-lg border border-[#3a2a1f]/25">
-          <p className="text-neutral-600 text-center mb-4 text-sm sm:text-base">
-            Todavía no hay {title.toLowerCase()} agregados
-          </p>
-          <button
-            onClick={onAdd}
-            className="inline-flex items-center gap-2 bg-[#f2b24c] hover:brightness-95 text-[#2a1b12] font-semibold py-2 px-6 rounded-full transition-all shadow-sm"
-            type="button"
-          >
-            <Plus className="h-4 w-4" />
-            Agregar cupón
-          </button>
-        </div>
-      )}
+      {(title === "Promos" && (!rows || rows.length === 0)) ||
+        (title === "Cupones" && (!rows || rows.length === 0) && (
+          <div className="flex flex-col items-center justify-center py-12 px-4 bg-[#f3e3bf] rounded-lg border border-[#3a2a1f]/25">
+            <p className="text-neutral-600 text-center mb-4 text-sm sm:text-base">
+              Todavía no hay {title.toLowerCase()} agregados
+            </p>
+            <button
+              onClick={onAdd}
+              className="inline-flex items-center gap-2 bg-[#f2b24c] hover:brightness-95 text-[#2a1b12] font-semibold py-2 px-6 rounded-full transition-all shadow-sm"
+              type="button"
+            >
+              <Plus className="h-4 w-4" />
+              Agregar cupón
+            </button>
+          </div>
+        ))}
 
       {/* Vista de tabla para desktop */}
       <div className="hidden sm:block overflow-x-auto rounded-lg border border-[#3a2a1f]/25">
@@ -151,6 +151,7 @@ function Section({
             </tr>
           </thead>
 
+          {rows ?
           <tbody>
             {rows.map((r, idx) => (
               <tr
@@ -164,18 +165,19 @@ function Section({
 
                 <td className="px-3 lg:px-4 py-2.5">
                   <div className="flex items-center justify-center gap-2">
-                    {title !== "Cupones" && 
-                    <button
-                      onClick={() => onEdit(r, idx)}
-                      className="cursor-pointer inline-flex items-center gap-1.5 text-green-700 hover:text-green-800 transition-colors p-1 hover:bg-green-100 rounded"
-                      type="button"
-                      title="Editar"
-                    >
-                      <Pencil className="h-4 w-4" />
-                      <span className="font-medium hidden lg:inline">
-                        Editar
-                      </span>
-                    </button>}
+                    {title !== "Cupones" && (
+                      <button
+                        onClick={() => onEdit(r, idx)}
+                        className="cursor-pointer inline-flex items-center gap-1.5 text-green-700 hover:text-green-800 transition-colors p-1 hover:bg-green-100 rounded"
+                        type="button"
+                        title="Editar"
+                      >
+                        <Pencil className="h-4 w-4" />
+                        <span className="font-medium hidden lg:inline">
+                          Editar
+                        </span>
+                      </button>
+                    )}
 
                     <button
                       onClick={() => onDelete(idx)}
@@ -190,7 +192,7 @@ function Section({
                     </button>
                   </div>
                 </td>
-                
+
                 {/* <td className="px-3 lg:px-4 py-2.5 text-right">
                   <div className="flex justify-end">
                     <StockToggle
@@ -201,7 +203,9 @@ function Section({
                 </td> */}
               </tr>
             ))}
-          </tbody>
+          </tbody> : <tbody>
+              <tr>Todavia no hay promociones agregadas</tr>
+            </tbody>}
         </table>
       </div>
 
@@ -221,7 +225,7 @@ function Section({
                   ${r.price || r.price_list?.[0]}.00
                 </p>
               </div>
-             {/* <StockToggle
+              {/* <StockToggle
                 value={r.stock}
                 onChange={() => onToggleStock(idx)}
               /> */}
@@ -265,7 +269,7 @@ function Section({
           <span className="whitespace-nowrap">Agregar nuevo producto</span>
         </button>
       </div>
-      </section>
+    </section>
   );
 }
 
@@ -531,7 +535,7 @@ export default function MainMenuGestion() {
           }
         } else if (currentCategory === "Promos") {
           formData.append("name", data.name ?? "");
-          formData.append("options", data.options ?.toString() || "1");
+          formData.append("options", data.options?.toString() || "1");
           formData.append("stock", "1".toString());
           formData.append("description", data.description ?? "");
           formData.append("quantity", String(Number(data.quantity || 1)));
@@ -541,12 +545,13 @@ export default function MainMenuGestion() {
             throw new Error("Tenés que seleccionar una imagen (File).");
           }
           formData.append("image", data.image);
-          
-          const list = (data.description_list ?? []).map(s => s.trim()).filter(Boolean);
+
+          const list = (data.description_list ?? [])
+            .map((s) => s.trim())
+            .filter(Boolean);
           for (const item of list) formData.append("description_list", item);
-          
         }
-        
+
         // Cupones usa JSON en lugar de FormData
         if (currentCategory === "Cupones") {
           body = JSON.stringify({
@@ -807,14 +812,25 @@ export default function MainMenuGestion() {
 
           {/* Secciones con mejor espaciado */}
           <div className="space-y-8 sm:space-y-10">
-            <Section
-              title="Promos"
-              rows={promos}
-              onEdit={(row) => handleOpenModal("Promos", row)}
-              onDelete={(index) => handleDeleteProduct("Promos", index)}
-              onAdd={() => handleOpenModal("Promos")}
-              onToggleStock={(index) => handleToggleStock("Promos", index)}
-            />
+            {promos ? (
+              <Section
+                title="Promos"
+                rows={promos}
+                onEdit={(row) => handleOpenModal("Promos", row)}
+                onDelete={(index) => handleDeleteProduct("Promos", index)}
+                onAdd={() => handleOpenModal("Promos")}
+                onToggleStock={(index) => handleToggleStock("Promos", index)}
+              />
+            ) : (
+              <Section
+                title="Promos"
+                rows={[]}
+                onEdit={() => {}}
+                onDelete={() => {}}
+                onAdd={() => handleOpenModal("Promos")}
+                onToggleStock={() => {}}
+              />
+            )}
             <Section
               title="Hamburguesas"
               rows={burgers}
