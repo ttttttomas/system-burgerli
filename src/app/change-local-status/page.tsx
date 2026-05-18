@@ -19,7 +19,7 @@ interface Local {
   opening_hours: string;
 }
 
-const DAYS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+const DAYS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
 function parseOpeningHours(raw: string | null | undefined): ParsedSchedule | null {
   if (!raw) return null;
