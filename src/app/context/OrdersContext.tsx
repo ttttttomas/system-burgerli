@@ -15,6 +15,7 @@ interface OrdersContextType {
   moveToReady: (orderId: string) => void;
   markAsDelivered: (orderId: string) => void;
   cancelOrder: (orderId: string, orderState: "new" | "preparation" | "ready") => Promise<void>;
+  transferOrder: (orderId: string, targetLocal: string) => Promise<void>;
   enableAudioNotifications: () => void;
 }
 
@@ -379,6 +380,34 @@ export function OrdersContextProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Función para transferir un pedido a otro local
+  const transferOrder = async (orderId: string, targetLocal: string) => {
+    // Optimistic: remover del estado local
+    setNewOrders((prev) => prev.filter((o) => o.id_order !== orderId));
+
+    try {
+      const response = await fetch(`https://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/${orderId}/local`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ local: targetLocal }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => null);
+        throw new Error(err?.detail || `Error HTTP ${response.status}`);
+      }
+
+      console.log("✅ Pedido transferido exitosamente a", targetLocal);
+      toast.success(`Pedido transferido a ${targetLocal}`);
+    } catch (error) {
+      console.error("❌ Error transfiriendo pedido:", error);
+      toast.error("Error al transferir el pedido");
+    }
+  };
+
   // WebSocket connection
   useEffect(() => {
     if (!session || !session.local) {
@@ -466,6 +495,20 @@ export function OrdersContextProvider({ children }: { children: ReactNode }) {
                   break;
               }
             }
+          } else if (msg.event === "order_transferred") {
+            const { order_id, from, to, pedido } = msg;
+            const sessionLocal = session?.local?.toLowerCase();
+
+            if (from?.toLowerCase() === sessionLocal) {
+              setNewOrders((prev) => prev.filter((o) => o.id_order !== order_id));
+              console.log(`📤 Pedido ${order_id} transferido a ${to}`);
+            }
+
+            if (to?.toLowerCase() === sessionLocal) {
+              setNewOrders((prev) => [...prev, { ...pedido, status: "Nuevo" }]);
+              toast.success("Nuevo pedido recibido de otro local");
+              console.log(`📥 Pedido ${order_id} recibido de ${from}`);
+            }
           }
         } catch (e) {
           console.error("❌ Error procesando mensaje:", e);
@@ -522,6 +565,7 @@ export function OrdersContextProvider({ children }: { children: ReactNode }) {
         moveToReady,
         markAsDelivered,
         cancelOrder,
+        transferOrder,
         enableAudioNotifications,
       }}
     >

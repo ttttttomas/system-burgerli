@@ -7,6 +7,7 @@ import Tarjeta from "./Tarjeta";
 
 import { Orders } from "@/types";
 import { parseLineItems } from "@/lib/ProductsToJson";
+import { useSession } from "@/app/context/SessionContext";
 
 interface NewOrderCardProps {
   order: Orders;
@@ -14,6 +15,7 @@ interface NewOrderCardProps {
   timeAgo?: string;
   onMoveToPreparation: (orderId: string) => void;
   onCancelOrder: (orderId: string) => void;
+  onTransferOrder?: (orderId: string, targetLocal: string) => void;
 }
 
 // Helper function to get selected_options from either naming convention
@@ -26,8 +28,35 @@ export default function NewOrderCard({
   timeAgo = "Hace un momento",
   onMoveToPreparation,
   onCancelOrder,
+  onTransferOrder,
 }: NewOrderCardProps) {
   const [selectedOrder, setSelectedOrder] = useState<Orders | null>(null);
+  const [showTransfer, setShowTransfer] = useState(false);
+  const [locals, setLocals] = useState<any[]>([]);
+  const [selectedLocal, setSelectedLocal] = useState("");
+
+  const { session, locals: getLocals } = useSession();
+
+  const handleOpenTransfer = async () => {
+    setShowTransfer(true);
+    if (locals.length === 0) {
+      try {
+        const data = await getLocals();
+        setLocals(data || []);
+      } catch (e) {
+        console.error("Error fetching locals:", e);
+      }
+    }
+  };
+
+  const handleConfirmTransfer = () => {
+    if (selectedLocal && order.id_order && onTransferOrder) {
+      onTransferOrder(order.id_order, selectedLocal);
+      setShowTransfer(false);
+      setSelectedLocal("");
+      closeModal();
+    }
+  };
 
   const productCount = order.products?.length || 0;
 
@@ -182,6 +211,57 @@ export default function NewOrderCard({
                 >
                   🗑️ Cancelar pedido
                 </button>
+
+                {onTransferOrder && (
+                  <>
+                    {!showTransfer ? (
+                      <button
+                        className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gray-700 py-3 font-bold text-white transition-all hover:bg-gray-800"
+                        onClick={handleOpenTransfer}
+                      >
+                        🔄 Cambiar local
+                      </button>
+                    ) : (
+                      <div className="flex flex-col gap-2 rounded-xl bg-gray-100 p-3">
+                        <label className="text-sm font-semibold text-gray-700">
+                          Transferir a:
+                        </label>
+                        <select
+                          className="rounded-lg border border-gray-300 p-2 text-sm"
+                          value={selectedLocal}
+                          onChange={(e) => setSelectedLocal(e.target.value)}
+                        >
+                          <option value="">Seleccionar local...</option>
+                          {locals
+                            .filter((l: any) => l.name?.toLowerCase() !== session?.local?.toLowerCase())
+                            .map((l: any) => (
+                              <option key={l.id || l.name} value={l.name}>
+                                {l.name}
+                              </option>
+                            ))}
+                        </select>
+                        <div className="flex gap-2">
+                          <button
+                            className="flex-1 cursor-pointer rounded-lg bg-green-600 py-2 font-bold text-white transition-all hover:bg-green-700 disabled:opacity-50"
+                            disabled={!selectedLocal}
+                            onClick={handleConfirmTransfer}
+                          >
+                            Confirmar
+                          </button>
+                          <button
+                            className="cursor-pointer rounded-lg bg-gray-400 px-4 py-2 font-bold text-white transition-all hover:bg-gray-500"
+                            onClick={() => {
+                              setShowTransfer(false);
+                              setSelectedLocal("");
+                            }}
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             </div>
 

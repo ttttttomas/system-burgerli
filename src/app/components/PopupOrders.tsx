@@ -12,9 +12,10 @@ interface PopupOrdersProps {
   orders: Orders[];
   onMoveToPreparation: (orderId: string) => void;
   onCancelOrder: (orderId: string) => void;
+  onTransferOrder?: (orderId: string, targetLocal: string) => void;
 }
 
-export default function PopupOrders({orders, onMoveToPreparation, onCancelOrder}: PopupOrdersProps) {
+export default function PopupOrders({orders, onMoveToPreparation, onCancelOrder, onTransferOrder}: PopupOrdersProps) {
   const [isOpen, setIsOpen] = useState(false);
   const handleClick = () => {
     setIsOpen(!isOpen);
@@ -79,6 +80,7 @@ export default function PopupOrders({orders, onMoveToPreparation, onCancelOrder}
                   timeAgo="Hace un momento"
                   onMoveToPreparation={onMoveToPreparation}
                   onCancelOrder={onCancelOrder}
+                  onTransferOrder={onTransferOrder}
                 />
               ))
             ) : (
