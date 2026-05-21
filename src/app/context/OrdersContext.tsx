@@ -422,6 +422,7 @@ export function OrdersContextProvider({ children }: { children: ReactNode }) {
 
       console.log("🔌 Intentando conectar WebSocket...");
       const ws = new WebSocket(`wss://burgerli.com.ar/MdpuF8KsXiRArNIHtI6pXO2XyLSJMTQ8_Burgerli/api/ws/orders`);
+      // const ws = new WebSocket(`ws://localhost:8000/ws/orders`);
 
       wsRef.current = ws;
 
@@ -498,7 +499,7 @@ export function OrdersContextProvider({ children }: { children: ReactNode }) {
           } else if (msg.event === "order_transferred") {
             const { order_id, from, to, pedido } = msg;
             const sessionLocal = session?.local?.toLowerCase();
-
+            console.log(msg)
             if (from?.toLowerCase() === sessionLocal) {
               setNewOrders((prev) => prev.filter((o) => o.id_order !== order_id));
               console.log(`📤 Pedido ${order_id} transferido a ${to}`);

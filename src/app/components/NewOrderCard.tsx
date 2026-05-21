@@ -219,7 +219,7 @@ export default function NewOrderCard({
                         className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gray-700 py-3 font-bold text-white transition-all hover:bg-gray-800"
                         onClick={handleOpenTransfer}
                       >
-                        🔄 Cambiar local
+                        🔄 Transferir pedido
                       </button>
                     ) : (
                       <div className="flex flex-col gap-2 rounded-xl bg-gray-100 p-3">
