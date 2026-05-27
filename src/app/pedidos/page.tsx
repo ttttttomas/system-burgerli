@@ -13,6 +13,7 @@ export default function HomePage() {
     moveToReady,
     markAsDelivered,
     cancelOrder,
+    transferOrder,
     enableAudioNotifications,
   } = useOrders();
 
@@ -43,6 +44,7 @@ export default function HomePage() {
         orders={newOrders}
         onMoveToPreparation={moveToPreparation}
         onCancelOrder={(orderId: string) => cancelOrder(orderId, "new")}
+        onTransferOrder={transferOrder}
       />
       <h2 className="pt-5 text-2xl font-bold">Pedidos en preparación</h2>
       {/* LISTA DE PEDIDOS EN PREPARACION*/}
